@@ -165,8 +165,8 @@
     <div class="orderLines" id="orderList"></div>
     <textarea id="orderText" readonly></textarea>
     <button class="btn copy-btn" onclick="copyText()">Copiar texto</button>
-    <button class="btn whatsapp-btn" onclick="sendWhatsApp()">Enviar por WhatsApp</button>
-    <button class="btn clear-btn" onclick="clearOrder()">Limpiar pedido</button>
+<button class="btn whatsapp-btn" onclick="sendWhatsAppPropio()">Enviar a Botonera Enri</button>
+<button class="btn copy-btn" style="background:#0ea5e9" onclick="sendWhatsAppOtro()">Enviar a otro número</button>    <button class="btn clear-btn" onclick="clearOrder()">Limpiar pedido</button>
   </div>
 </div>
 
@@ -1624,8 +1624,32 @@ function clearOrder(){
   toast("Pedido limpiado");
 }
 
-function sendWhatsApp(){
-  const number = prompt("Ingresá tu número WhatsApp con código país. Ej: 54911XXXXXXX");
+
+const MI_NUMERO = "5491158390513"; 
+
+function sendWhatsAppPropio(){
+  if(order.length === 0){
+    toast("El pedido está vacío");
+    return;
+  }
+
+  const text = encodeURIComponent($("orderText").value);
+  window.open(`https://wa.me/${MI_NUMERO}?text=${text}`, "_blank");
+}
+
+function sendWhatsAppOtro(){
+  if(order.length === 0){
+    toast("El pedido está vacío");
+    return;
+  }
+
+  const number = prompt("Ingresá número con código país. Ej: 54911XXXXXXX");
+  if(!number) return;
+
+  const limpio = number.replace(/\D/g,"");
+  const text = encodeURIComponent($("orderText").value);
+  window.open(`https://wa.me/${limpio}?text=${text}`, "_blank");
+}
   if(!number) return;
   const text = encodeURIComponent($("orderText").value);
   window.open(`https://wa.me/${number.replace(/\D/g,"")}?text=${text}`, "_blank");
