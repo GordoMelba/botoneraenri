@@ -271,6 +271,84 @@
   }
 
 }
+    /* ===== GALERIA ===== */
+
+.galleryOverlay{
+  position: fixed;
+  inset:0;
+  background: rgba(0,0,0,0.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  padding:20px;
+}
+
+.galleryModal{
+  background:white;
+  width:min(800px,95vw);
+  border-radius:16px;
+  padding:20px;
+  position:relative;
+}
+
+.galleryClose{
+  position:absolute;
+  top:10px;
+  right:15px;
+  font-size:22px;
+  background:none;
+  border:none;
+  cursor:pointer;
+}
+
+.galleryMain{
+  position:relative;
+  text-align:center;
+}
+
+.galleryMain img{
+  max-width:100%;
+  max-height:400px;
+  object-fit:contain;
+}
+
+.galleryArrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:#111;
+  color:white;
+  border:none;
+  font-size:22px;
+  padding:8px 12px;
+  cursor:pointer;
+  border-radius:8px;
+}
+
+.galleryArrow.left{ left:0; }
+.galleryArrow.right{ right:0; }
+
+.galleryThumbs{
+  margin-top:15px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.galleryThumbs img{
+  width:60px;
+  height:60px;
+  object-fit:cover;
+  cursor:pointer;
+  border-radius:6px;
+  border:2px solid transparent;
+}
+
+.galleryThumbs img.active{
+  border-color:#111;
+}
   </style>
 </head>
 
@@ -1073,6 +1151,21 @@ setCounts();
 updateOrder();
 loadCategory("metalicos");
 </script>
+
+  <!-- MODAL GALERIA COLORES -->
+<div class="galleryOverlay" id="galleryOverlay">
+  <div class="galleryModal">
+    <button class="galleryClose" onclick="closeGallery()">×</button>
+
+    <div class="galleryMain">
+      <button class="galleryArrow left" onclick="prevImage()">‹</button>
+      <img id="galleryMainImg" src="" />
+      <button class="galleryArrow right" onclick="nextImage()">›</button>
+    </div>
+
+    <div class="galleryThumbs" id="galleryThumbs"></div>
+  </div>
+</div>
 
 </body>
 </html>
