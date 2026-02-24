@@ -126,9 +126,14 @@
   border-radius: 18px;
   box-shadow: var(--shadow);
   border: 1px solid rgba(255,255,255,.25);
-  overflow: hidden;      /* 🔥 corta el scroll horizontal del modal */
-  display: flex;         /* 🔥 para separar header/body */
+
+  overflow: hidden;
+
+  display: flex;
   flex-direction: column;
+
+  padding: 28px 30px 24px 30px;  /* 👈 esto agrega aire */
+  box-sizing: border-box;       /* 👈 importante */
 }
 
 /* Si tenés un header del modal, esto evita que se “pierda” */
