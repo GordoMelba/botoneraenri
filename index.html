@@ -1,239 +1,764 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Botonera Enri - Catálogo Mayorista</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f6fa;
-}
+  :root{
+    --bg:#f5f6fa;
+    --panel:#ffffff;
+    --line:#e5e7eb;
+    --text:#0f172a;
+    --muted:#64748b;
+    --blue:#1c3f99;
+    --blue2:#16357f;
+    --green:#16a34a;
+    --green2:#12823c;
+    --shadow: 0 18px 50px rgba(15, 23, 42, .12);
+    --radius:14px;
+    --radius2:18px;
+  }
 
-header {
-  background: #1c3f99;
-  color: white;
-  padding: 15px 20px;
-  font-weight: bold;
-  font-size: 18px;
-}
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
 
-.container {
-  display: flex;
-  height: calc(100vh - 60px);
-}
+  header{
+    background: var(--blue);
+    color: white;
+    padding: 16px 20px;
+    font-weight: 800;
+    font-size: 18px;
+  }
 
-.sidebar {
-  width: 220px;
-  background: white;
-  padding: 20px;
-  border-right: 1px solid #ddd;
-}
+  .container{
+    display:flex;
+    height: calc(100vh - 56px);
+  }
 
-.sidebar h3 {
-  margin-top: 0;
-}
+  .sidebar{
+    width: 260px;
+    background: var(--panel);
+    padding: 18px;
+    border-right: 1px solid var(--line);
+  }
+  .sidebar h3{
+    margin: 0 0 14px 0;
+    font-size: 18px;
+    letter-spacing: -.2px;
+  }
 
-.category {
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 6px;
-  margin-bottom: 5px;
-}
+  .category{
+    padding: 12px 12px;
+    cursor:pointer;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--text);
+    background: #f3f5ff;
+    border: 1px solid transparent;
+    user-select:none;
+  }
+  .category:hover{ border-color:#dbe3ff; }
+  .category.active{
+    background: linear-gradient(180deg, var(--blue), var(--blue2));
+    color:white;
+  }
 
-.category:hover {
-  background: #e8efff;
-}
+  .main{
+    flex:1;
+    padding: 18px;
+    overflow-y:auto;
+  }
 
-.main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
+  .mainTop{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  #categoryTitle{
+    margin:0;
+    font-size: 28px;
+    letter-spacing: -.4px;
+  }
 
-.products {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 15px;
-}
+  .products{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
 
-.product {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-}
+  .product{
+    background: var(--panel);
+    border-radius: var(--radius2);
+    border: 1px solid var(--line);
+    cursor:pointer;
+    overflow:hidden;
+    transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .product:hover{
+    transform: translateY(-2px);
+    border-color:#dbe3ff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, .10);
+  }
 
-.product:hover {
-  border-color: #1c3f99;
-}
+  .pImg{
+    height: 160px;
+    background:#eef2ff;
+    position: relative;
+  }
+  .pImg img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .pBadge{
+    position:absolute;
+    top:10px;
+    left:10px;
+    background: rgba(15,23,42,.72);
+    color:white;
+    font-size:12px;
+    font-weight:800;
+    padding:6px 10px;
+    border-radius: 999px;
+  }
 
-.order {
-  width: 350px;
-  background: white;
-  padding: 20px;
-  border-left: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-}
+  .pBody{
+    padding: 12px 12px 14px 12px;
+    display:flex;
+    flex-direction:column;
+    gap: 6px;
+  }
+  .pTitle{
+    font-weight: 900;
+    letter-spacing:-.2px;
+    font-size: 15px;
+  }
+  .pSub{
+    color: var(--muted);
+    font-size: 12px;
+    line-height:1.35;
+  }
+  .pFoot{
+    margin-top: 6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .pill{
+    background:#f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    color:#334155;
+    white-space: nowrap;
+  }
 
-textarea {
-  width: 100%;
-  height: 200px;
-  margin-top: 10px;
-}
+  .order{
+    width: 380px;
+    background: var(--panel);
+    padding: 18px;
+    border-left: 1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap: 12px;
+  }
 
-button {
-  padding: 10px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
+  .order h3{
+    margin:0;
+    font-size: 20px;
+    letter-spacing:-.2px;
+  }
+  .orderLines{
+    border:1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+    max-height: 120px;
+    overflow:auto;
+    background: #fbfcff;
+  }
+  .orderLine{
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom:1px dashed #e6eaf2;
+  }
+  .orderLine:last-child{ border-bottom:none; }
 
-.copy-btn {
-  background: #1c3f99;
-  color: white;
-}
+  textarea{
+    width:100%;
+    height: 240px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    padding: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 12px;
+    resize: vertical;
+    background:#fff;
+  }
 
-.whatsapp-btn {
-  background: #16a34a;
-  color: white;
-}
+  .btn{
+    padding: 12px 12px;
+    border: none;
+    border-radius: 10px;
+    cursor:pointer;
+    font-weight: 900;
+    font-size: 14px;
+    user-select:none;
+  }
+  .copy-btn{
+    background: var(--blue);
+    color:white;
+  }
+  .copy-btn:hover{ background: var(--blue2); }
+  .whatsapp-btn{
+    background: var(--green);
+    color:white;
+  }
+  .whatsapp-btn:hover{ background: var(--green2); }
+  .clear-btn{
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    color:#334155;
+  }
+  .clear-btn:hover{ background:#e9eef6; }
+
+  /* Modal */
+  .modalOverlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(2,6,23,.55);
+    display:none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 999;
+  }
+  .modal{
+    width: min(920px, 96vw);
+    background: var(--panel);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,.25);
+  }
+  .modalHeader{
+    padding: 14px 16px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap: 12px;
+    border-bottom:1px solid var(--line);
+  }
+  .modalHeader .code{
+    color:#f97316;
+    font-weight: 900;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .modalHeader .title{
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing:-.3px;
+    margin:0;
+  }
+  .modalHeader .x{
+    border:none;
+    background: transparent;
+    cursor:pointer;
+    font-size: 22px;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: 10px;
+    color:#334155;
+  }
+  .modalHeader .x:hover{ background:#f1f5f9; }
+
+  .modalBody{
+    display:grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 18px;
+    padding: 16px;
+  }
+  @media (max-width: 860px){
+    .modalBody{ grid-template-columns: 1fr; }
+  }
+
+  .modalImg{
+    border-radius: 14px;
+    overflow:hidden;
+    border: 1px solid var(--line);
+    background:#eef2ff;
+    height: 360px;
+  }
+  .modalImg img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .modalForm{
+    display:flex;
+    flex-direction:column;
+    gap: 12px;
+  }
+
+  .desc{
+    color: var(--muted);
+    font-size: 13px;
+    line-height:1.35;
+  }
+
+  .fieldLabel{
+    font-weight: 900;
+    font-size: 14px;
+    margin: 4px 0 6px 0;
+  }
+  .options{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 10px;
+  }
+  .opt{
+    border:1px solid var(--line);
+    background:#f8fafc;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor:pointer;
+    font-weight: 800;
+    font-size: 13px;
+    user-select:none;
+    min-width: 90px;
+    text-align:center;
+  }
+  .opt:hover{ border-color:#cfe0ff; background:#eef2ff; }
+  .opt.selected{
+    background: linear-gradient(180deg, var(--blue), var(--blue2));
+    border-color: rgba(0,0,0,0);
+    color:white;
+  }
+
+  .qtyRow{
+    display:flex;
+    gap: 10px;
+    align-items:center;
+  }
+  .qtyRow input{
+    width: 160px;
+    padding: 12px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    font-size: 14px;
+    outline:none;
+  }
+  .hint{
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .modalFooter{
+    padding: 14px 16px;
+    border-top:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 12px;
+    background:#fbfcff;
+  }
+  .modalFooter .minInfo{
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .addBtn{
+    background:#f97316;
+    color:white;
+    border:none;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 950;
+    cursor:pointer;
+  }
+  .addBtn:hover{ filter: brightness(.95); }
+
+  .toast{
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(2,6,23,.85);
+    color: white;
+    padding: 10px 12px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 13px;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .18s ease, transform .18s ease;
+    z-index: 1000;
+  }
+  .toast.show{
+    opacity:1;
+    transform: translateX(-50%) translateY(-4px);
+  }
 </style>
 </head>
 
 <body>
 
-<header>
-Botonera Enri - Catálogo Mayorista
-</header>
+<header>Botonera Enri - Catálogo Mayorista</header>
 
 <div class="container">
 
-<div class="sidebar">
-<h3>Categorías</h3>
-<div class="category" onclick="loadCategory('metalicos')">Cierres metálicos</div>
-<div class="category" onclick="loadCategory('plasticos')">Cierres plásticos</div>
-<div class="category" onclick="loadCategory('botones')">Botones</div>
+  <div class="sidebar">
+    <h3>Categorías</h3>
+    <div class="category" id="cat-metalicos" onclick="loadCategory('metalicos')">Cierres metálicos</div>
+    <div class="category" id="cat-plasticos" onclick="loadCategory('plasticos')">Cierres plásticos</div>
+    <div class="category" id="cat-botones" onclick="loadCategory('botones')">Botones</div>
+  </div>
+
+  <div class="main">
+    <div class="mainTop">
+      <h2 id="categoryTitle">Seleccioná una categoría</h2>
+    </div>
+    <div class="products" id="products"></div>
+  </div>
+
+  <div class="order">
+    <h3>Pedido mayorista</h3>
+    <div class="orderLines" id="orderList"></div>
+
+    <textarea id="orderText" readonly></textarea>
+
+    <button class="btn copy-btn" onclick="copyText()">Copiar texto</button>
+    <button class="btn whatsapp-btn" onclick="sendWhatsApp()">Enviar por WhatsApp</button>
+    <button class="btn clear-btn" onclick="clearOrder()">Limpiar pedido</button>
+  </div>
+
 </div>
 
-<div class="main">
-<h2 id="categoryTitle">Productos</h2>
-<div class="products" id="products"></div>
+<!-- Modal -->
+<div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modalHeader">
+      <div>
+        <div class="code" id="mCode">Código: —</div>
+        <h3 class="title" id="mTitle">Producto</h3>
+      </div>
+      <button class="x" onclick="closeModal()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="modalBody">
+      <div>
+        <div class="modalImg">
+          <img id="mImg" alt="Foto del producto" src="" />
+        </div>
+      </div>
+
+      <div class="modalForm">
+        <div class="desc" id="mDesc"></div>
+
+        <div>
+          <div class="fieldLabel">Color <span style="color:#ef4444">*</span></div>
+          <div class="options" id="mColors"></div>
+        </div>
+
+        <div>
+          <div class="fieldLabel">Medida <span style="color:#ef4444">*</span></div>
+          <div class="options" id="mSizes"></div>
+        </div>
+
+        <div>
+          <div class="fieldLabel">Cantidad <span style="color:#ef4444">*</span></div>
+          <div class="qtyRow">
+            <input id="mQty" type="number" min="1" step="1" value="1" />
+            <div class="hint" id="mMinHint">Mínimo: —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modalFooter">
+      <div class="minInfo" id="mMinInfo">Mínimo: —</div>
+      <button class="addBtn" onclick="confirmAdd()">Agregar combinación</button>
+    </div>
+  </div>
 </div>
 
-<div class="order">
-<h3>Pedido mayorista</h3>
-<div id="orderList"></div>
-
-<textarea id="orderText" readonly></textarea>
-
-<button class="copy-btn" onclick="copyText()">Copiar texto</button>
-<button class="whatsapp-btn" onclick="sendWhatsApp()">Enviar por WhatsApp</button>
-</div>
-
-</div>
+<div class="toast" id="toast">Listo</div>
 
 <script>
+  // === Catálogo de ejemplo (reemplazá o expandí) ===
+  // IMPORTANTE: agregué image y code (opcional).
+  // Si todavía no tenés fotos propias, dejá placeholders o links públicos.
+  const catalog = {
+    metalicos: [
+      {
+        code: "CM-001",
+        name: "Cierre bronce 4.5",
+        desc: "Cierre bronce con disponibilidad en múltiples medidas y colores.",
+        image: "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=1600&q=75",
+        colors: ["negro","azul","blanco","beige","apto","militar"],
+        sizes: ["8","10","12","14","16","18","20"],
+        min: 50,
+        unit: "unidades"
+      }
+    ],
+    plasticos: [
+      {
+        code: "CP-001",
+        name: "Cierre plástico 5",
+        desc: "Cierre plástico reforzado, varias medidas y colores.",
+        image: "https://images.unsplash.com/photo-1587731556938-38755b4803a6?auto=format&fit=crop&w=1600&q=75",
+        colors: ["negro","gris"],
+        sizes: ["50","60","70","80","104"],
+        min: 50,
+        unit: "unidades"
+      }
+    ],
+    botones: [
+      {
+        code: "B-001",
+        name: "Botón metálico 18mm",
+        desc: "Botón metálico para indumentaria.",
+        image: "https://images.unsplash.com/photo-1520975939898-6d2c6a622a80?auto=format&fit=crop&w=1600&q=75",
+        colors: ["níquel","dorado","negro"],
+        sizes: ["18 mm"],
+        min: 100,
+        unit: "unidades"
+      }
+    ]
+  };
 
-const catalog = {
-metalicos: [
-{
-name: "Cierre bronce 4.5",
-colors: ["Negro","Azul","Blanco"],
-sizes: ["8","10","12"],
-min: 50
-}
-],
-plasticos: [
-{
-name: "Cierre plástico 5",
-colors: ["Negro","Gris"],
-sizes: ["50 cm","60 cm"],
-min: 50
-}
-],
-botones: [
-{
-name: "Botón metálico 18mm",
-colors: ["Níquel","Dorado"],
-sizes: ["18 mm"],
-min: 100
-}
-]
-};
+  let currentCategory = null;
+  let order = [];
 
-let currentCategory = null;
-let order = [];
+  // Modal state
+  let modalProduct = null;
+  let selectedColor = null;
+  let selectedSize  = null;
 
-function loadCategory(cat) {
-currentCategory = cat;
-document.getElementById("categoryTitle").innerText = cat.toUpperCase();
-const container = document.getElementById("products");
-container.innerHTML = "";
+  const $ = (id) => document.getElementById(id);
 
-catalog[cat].forEach((p,i)=>{
-container.innerHTML += `
-<div class="product" onclick="openProduct(${i})">
-<b>${p.name}</b><br>
-Mínimo: ${p.min} unidades
-</div>`;
-});
-}
+  function toast(msg){
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(()=> t.classList.remove("show"), 1300);
+  }
 
-function openProduct(index) {
-const p = catalog[currentCategory][index];
-const color = prompt("Elegí color:\n"+p.colors.join(", "));
-if(!color) return;
+  function setActiveCat(cat){
+    ["metalicos","plasticos","botones"].forEach(c=>{
+      const el = $("cat-"+c);
+      if(!el) return;
+      el.classList.toggle("active", c===cat);
+    });
+  }
 
-const size = prompt("Elegí medida:\n"+p.sizes.join(", "));
-if(!size) return;
+  function loadCategory(cat){
+    currentCategory = cat;
+    setActiveCat(cat);
 
-let qty = prompt("Cantidad (mínimo "+p.min+")");
-if(!qty || qty < p.min) {
-alert("Cantidad mínima: "+p.min);
-return;
-}
+    const titleMap = {
+      metalicos: "CIERRES METÁLICOS",
+      plasticos: "PLÁSTICOS",
+      botones: "BOTONES"
+    };
 
-addToOrder(p.name, color, size, qty);
-}
+    $("categoryTitle").innerText = titleMap[cat] || cat.toUpperCase();
+    const container = $("products");
+    container.innerHTML = "";
 
-function addToOrder(name,color,size,qty){
-const item = `${name} - ${color} - ${size} - ${qty} unidades`;
-order.push(item);
-updateOrder();
-}
+    catalog[cat].forEach((p, i) => {
+      container.innerHTML += `
+        <div class="product" onclick="openProduct('${cat}', ${i})">
+          <div class="pImg">
+            <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">
+            <div class="pBadge">${escapeHtml(p.code || "")}</div>
+          </div>
+          <div class="pBody">
+            <div class="pTitle">${escapeHtml(p.name)}</div>
+            <div class="pSub">${escapeHtml(p.desc || "")}</div>
+            <div class="pFoot">
+              <span class="pill">Min. ${escapeHtml(String(p.min))} ${escapeHtml(p.unit || "unidades")}</span>
+              <span>${(p.colors?.length||0)} colores · ${(p.sizes?.length||0)} medidas</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
 
-function updateOrder(){
-const list = document.getElementById("orderList");
-list.innerHTML = "";
-order.forEach(i=>{
-list.innerHTML += "<div>"+i+"</div>";
-});
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, (m) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
 
-document.getElementById("orderText").value =
-"PEDIDO MAYORISTA\n\n" + order.join("\n");
-}
+  function openProduct(cat, index){
+    modalProduct = catalog[cat][index];
+    selectedColor = null;
+    selectedSize  = null;
 
-function copyText(){
-const text = document.getElementById("orderText");
-text.select();
-document.execCommand("copy");
-alert("Texto copiado");
-}
+    $("mCode").innerText = "Código: " + (modalProduct.code || "—");
+    $("mTitle").innerText = modalProduct.name || "Producto";
+    $("mDesc").innerText = modalProduct.desc || "";
+    $("mImg").src = modalProduct.image || "";
+    $("mImg").alt = modalProduct.name || "Producto";
 
-function sendWhatsApp(){
-const number = prompt("Ingresá tu número WhatsApp con código país. Ej: 54911XXXXXXX");
-if(!number) return;
-const text = encodeURIComponent(document.getElementById("orderText").value);
-window.open(`https://wa.me/${number}?text=${text}`);
-}
+    // Build color buttons
+    const colorsWrap = $("mColors");
+    colorsWrap.innerHTML = "";
+    (modalProduct.colors || []).forEach(c=>{
+      const btn = document.createElement("div");
+      btn.className = "opt";
+      btn.textContent = c;
+      btn.onclick = ()=> selectColor(btn, c);
+      colorsWrap.appendChild(btn);
+    });
 
+    // Build size buttons
+    const sizesWrap = $("mSizes");
+    sizesWrap.innerHTML = "";
+    (modalProduct.sizes || []).forEach(s=>{
+      const btn = document.createElement("div");
+      btn.className = "opt";
+      btn.textContent = s;
+      btn.onclick = ()=> selectSize(btn, s);
+      sizesWrap.appendChild(btn);
+    });
+
+    // Quantity
+    $("mQty").value = modalProduct.min || 1;
+    $("mQty").min = modalProduct.min || 1;
+
+    $("mMinHint").innerText = `Mínimo: ${modalProduct.min} ${modalProduct.unit || "unidades"}`;
+    $("mMinInfo").innerText = `Mínimo: ${modalProduct.min} ${modalProduct.unit || "unidades"}`;
+
+    // Show modal
+    $("modalOverlay").style.display = "flex";
+  }
+
+  function closeModal(){
+    $("modalOverlay").style.display = "none";
+  }
+
+  // Close modal on backdrop click
+  $("modalOverlay").addEventListener("click", (e)=>{
+    if(e.target.id === "modalOverlay") closeModal();
+  });
+
+  // ESC closes modal
+  window.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape") closeModal();
+  });
+
+  function selectColor(btn, value){
+    selectedColor = value;
+    // unselect others
+    [...$("mColors").children].forEach(x=> x.classList.remove("selected"));
+    btn.classList.add("selected");
+  }
+
+  function selectSize(btn, value){
+    selectedSize = value;
+    [...$("mSizes").children].forEach(x=> x.classList.remove("selected"));
+    btn.classList.add("selected");
+  }
+
+  function confirmAdd(){
+    if(!modalProduct) return;
+
+    if(!selectedColor){
+      toast("Elegí un color");
+      return;
+    }
+    if(!selectedSize){
+      toast("Elegí una medida");
+      return;
+    }
+
+    let qty = Number($("mQty").value || 0);
+    const min = Number(modalProduct.min || 1);
+
+    if(!Number.isFinite(qty) || qty <= 0){
+      toast("Cantidad inválida");
+      return;
+    }
+    if(qty < min){
+      qty = min;
+      $("mQty").value = min;
+      toast("Se ajustó al mínimo");
+    }
+
+    addToOrder(modalProduct, selectedColor, selectedSize, qty);
+    closeModal();
+    toast("Agregado al pedido");
+  }
+
+  function addToOrder(p, color, size, qty){
+    const unit = p.unit || "unidades";
+    const line = `${p.name} - ${color} - ${size} - ${qty} ${unit}`;
+    order.push(line);
+    updateOrder();
+  }
+
+  function updateOrder(){
+    const list = $("orderList");
+    list.innerHTML = "";
+
+    if(order.length === 0){
+      list.innerHTML = `<div style="color:#64748b;font-size:13px;">Todavía no agregaste productos.</div>`;
+      $("orderText").value = "PEDIDO MAYORISTA\n\n(Agregar ítems desde el catálogo)";
+      return;
+    }
+
+    order.forEach(i=>{
+      const div = document.createElement("div");
+      div.className = "orderLine";
+      div.textContent = i;
+      list.appendChild(div);
+    });
+
+    $("orderText").value = "PEDIDO MAYORISTA\n\n" + order.join("\n");
+  }
+
+  function copyText(){
+    const text = $("orderText");
+    text.select();
+    document.execCommand("copy");
+    toast("Texto copiado");
+  }
+
+  function clearOrder(){
+    order = [];
+    updateOrder();
+    toast("Pedido limpiado");
+  }
+
+  function sendWhatsApp(){
+    const number = prompt("Ingresá tu número WhatsApp con código país. Ej: 54911XXXXXXX");
+    if(!number) return;
+    const text = encodeURIComponent($("orderText").value);
+    window.open(`https://wa.me/${number.replace(/\D/g,"")}?text=${text}`, "_blank");
+  }
+
+  // Estado inicial
+  updateOrder();
+  // carga por defecto
+  loadCategory("metalicos");
 </script>
 
 </body>
