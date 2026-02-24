@@ -1150,6 +1150,57 @@ function sendWhatsAppPropio(){
 setCounts();
 updateOrder();
 loadCategory("metalicos");
+
+  /* ===== GALERIA COLORES ===== */
+
+let galleryImages = [];
+let galleryIndex = 0;
+
+function openColorGallery(){
+  // ⚠️ ACA PONES LAS IMAGENES REALES
+  galleryImages = [
+    "https://placehold.co/800x600?text=Carta+1",
+    "https://placehold.co/800x600?text=Carta+2",
+    "https://placehold.co/800x600?text=Carta+3"
+  ];
+
+  galleryIndex = 0;
+  renderGallery();
+  document.getElementById("galleryOverlay").style.display = "flex";
+}
+
+function closeGallery(){
+  document.getElementById("galleryOverlay").style.display = "none";
+}
+
+function renderGallery(){
+  const mainImg = document.getElementById("galleryMainImg");
+  const thumbs = document.getElementById("galleryThumbs");
+
+  mainImg.src = galleryImages[galleryIndex];
+
+  thumbs.innerHTML = "";
+  galleryImages.forEach((src,i)=>{
+    const img = document.createElement("img");
+    img.src = src;
+    if(i===galleryIndex) img.classList.add("active");
+    img.onclick = ()=>{
+      galleryIndex = i;
+      renderGallery();
+    };
+    thumbs.appendChild(img);
+  });
+}
+
+function nextImage(){
+  galleryIndex = (galleryIndex + 1) % galleryImages.length;
+  renderGallery();
+}
+
+function prevImage(){
+  galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+  renderGallery();
+}
 </script>
 
   <!-- MODAL GALERIA COLORES -->
