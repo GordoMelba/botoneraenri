@@ -1,275 +1,240 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Botonera Enri — Catálogo mayorista</title>
-  <style>
-    :root{
-      --bg:#f4f6fb;
-      --panel:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e6eaf2;
-      --primary:#193a8a;
-      --primary2:#0f2f7a;
-      --accent:#16a34a;
-      --danger:#ef4444;
-      --shadow: 0 12px 30px rgba(15, 23, 42, .10);
-      --radius:16px;
-      --radius2:22px;
-      --max:1280px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue";
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Botonera Enri - Catálogo Mayorista</title>
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:var(--font);
-      background:var(--bg);
-      color:var(--text);
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+}
 
-    /* Top bar */
-    .topbar{
-      position:sticky; top:0; z-index:50;
-      background:rgba(255,255,255,.9);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--line);
-    }
-    .topbar-inner{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:14px 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px; min-width: 220px;
-    }
-    .logo{
-      width:42px; height:42px;
-      border-radius:12px;
-      background: linear-gradient(135deg, var(--primary), #355fe0);
-      box-shadow: var(--shadow);
-      display:grid; place-items:center;
-      color:white; font-weight:800;
-    }
-    .brand .t1{margin:0; font-weight:800; letter-spacing:-.3px; font-size:15px}
-    .brand .t2{margin:2px 0 0; color:var(--muted); font-size:12px}
+header {
+  background: #1c3f99;
+  color: white;
+  padding: 15px 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
 
-    .tabs{
-      display:flex; gap:6px; flex-wrap:wrap;
-      align-items:center;
-      justify-content:center;
-      flex:1;
-    }
-    .tab{
-      border:1px solid transparent;
-      background:transparent;
-      padding:10px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      color:var(--muted);
-      font-weight:700;
-      font-size:13px;
-    }
-    .tab.active{
-      background:#eef2ff;
-      border-color:#dbe3ff;
-      color:var(--primary);
-    }
+.container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
 
-    .top-actions{
-      display:flex; gap:10px; align-items:center; justify-content:flex-end;
-      min-width: 260px;
-    }
-    .btn{
-      border:1px solid var(--line);
-      background:white;
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      box-shadow: 0 10px 18px rgba(15, 23, 42, .05);
-      font-weight:700;
-      font-size:13px;
-      display:inline-flex; align-items:center; gap:8px;
-      user-select:none;
-      transition: transform .06s ease, background .2s ease, border-color .2s ease;
-    }
-    .btn:hover{ border-color:#d7deee; background:#fbfcff;}
-    .btn:active{ transform: translateY(1px); }
-    .btn.primary{ background: #e8efff; border-color:#cfe0ff; color:var(--primary); }
-    .btn.primary:hover{ background:#dce8ff; border-color:#bcd4ff;}
-    .btn.green{ background:#e9fbea; border-color:#bff0c6; color:#0f6a31;}
-    .btn.green:hover{ background:#d7f7da; border-color:#a8eab1;}
-    .btn.danger{ background:#fff1f2; border-color:#ffd1d7; color:#b91c1c;}
-    .btn.danger:hover{ background:#ffe4e7; border-color:#ffb7c1;}
+.sidebar {
+  width: 220px;
+  background: white;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+}
 
-    .search{
-      display:flex; align-items:center; gap:10px;
-      background:white;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px 12px;
-      width: 340px;
-      box-shadow: 0 10px 18px rgba(15, 23, 42, .05);
-    }
-    .search input{
-      border:0; outline:none; width:100%;
-      font-size:14px;
-      color:var(--text);
-    }
-    .search span{ color:var(--muted); font-size:13px; }
+.sidebar h3 {
+  margin-top: 0;
+}
 
-    /* Layout */
-    .wrap{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:18px;
-    }
-    .layout{
-      display:grid;
-      grid-template-columns: 280px 1fr 380px;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width: 1100px){
-      .layout{ grid-template-columns: 1fr; }
-      .top-actions{ min-width:auto; }
-      .search{ width: 100%; }
-    }
+.category {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
 
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .panel-h{
-      padding:14px 14px;
-      border-bottom:1px solid var(--line);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .panel-h h2{
-      margin:0; font-size:14px; letter-spacing:-.2px;
-    }
-    .panel-h .meta{ color:var(--muted); font-size:12px; }
+.category:hover {
+  background: #e8efff;
+}
 
-    /* Sidebar categories */
-    .cats{ padding:12px; display:flex; flex-direction:column; gap:8px;}
-    .cat{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid transparent;
-      cursor:pointer;
-      color:var(--text);
-      font-weight:800;
-      background:#f7f9ff;
-    }
-    .cat small{ color:var(--muted); font-weight:700; }
-    .cat.active{
-      background: linear-gradient(180deg, #1c3f99, #16357f);
-      color:white;
-      border-color: rgba(255,255,255,.18);
-    }
-    .cat.active small{ color: rgba(255,255,255,.8); }
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
 
-    /* Product grid */
-    .content{
-      padding:14px;
-    }
-    .content-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:12px;
-    }
-    .content-top h1{
-      margin:0;
-      font-size:18px;
-      letter-spacing:-.3px;
-    }
-    .chips{
-      display:flex; gap:8px; flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .chip{
-      background:#f2f5ff;
-      border:1px solid #dfe7ff;
-      color:var(--primary);
-      border-radius:999px;
-      padding:8px 10px;
-      font-size:12px;
-      font-weight:800;
-    }
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+}
 
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap:12px;
-    }
-    @media (max-width: 700px){
-      .grid{ grid-template-columns: 1fr; }
-    }
+.product {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
 
-    .p-card{
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      overflow:hidden;
-      background:white;
-      cursor:pointer;
-      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-    .p-card:hover{
-      transform: translateY(-2px);
-      border-color:#d7deee;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, .10);
-    }
-    .p-img{
-      height:170px;
-      background:#eef2ff;
-      position:relative;
-      overflow:hidden;
-    }
-    .p-img img{
-      width:100%; height:100%;
-      object-fit:cover;
-      transform: scale(1.02);
-      filter: saturate(1.05) contrast(1.02);
-    }
-    .badge{
-      position:absolute; top:10px; left:10px;
-      background: rgba(15, 23, 42, .68);
-      color:white;
-      border-radius:999px;
-      padding:6px 9px;
-      font-size:12px;
-      font-weight:800;
-    }
-    .p-body{ padding:12px; display:flex; flex-direction:column; gap:6px;}
-    .p-title{ font-weight:900; letter-spacing:-.2px; }
-    .p-sub{ color:var(--muted); font-size:12px; line-height:1.35;}
-    .p-foot{
-      margin-top:6px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      color:var(--muted); font-size:12px;
-    }
-    .p-min{
-      background:#f1f5f9;
-      border:1px solid #e2e8f0;
-      padding:6px 8px;
-      border-radius:999px;
-      font-weight:800;
-      color:#334155;
-    }
+.product:hover {
+  border-color: #1c3f99;
+}
 
-    /* Right order panel */
-    .order{
-      padding:14px;
-      display:flex; flex-direction:column; gap:12px;
-    }
-    .order-lines
+.order {
+  width: 350px;
+  background: white;
+  padding: 20px;
+  border-left: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+textarea {
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.copy-btn {
+  background: #1c3f99;
+  color: white;
+}
+
+.whatsapp-btn {
+  background: #16a34a;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+Botonera Enri - Catálogo Mayorista
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+<h3>Categorías</h3>
+<div class="category" onclick="loadCategory('metalicos')">Cierres metálicos</div>
+<div class="category" onclick="loadCategory('plasticos')">Cierres plásticos</div>
+<div class="category" onclick="loadCategory('botones')">Botones</div>
+</div>
+
+<div class="main">
+<h2 id="categoryTitle">Productos</h2>
+<div class="products" id="products"></div>
+</div>
+
+<div class="order">
+<h3>Pedido mayorista</h3>
+<div id="orderList"></div>
+
+<textarea id="orderText" readonly></textarea>
+
+<button class="copy-btn" onclick="copyText()">Copiar texto</button>
+<button class="whatsapp-btn" onclick="sendWhatsApp()">Enviar por WhatsApp</button>
+</div>
+
+</div>
+
+<script>
+
+const catalog = {
+metalicos: [
+{
+name: "Cierre bronce 4.5",
+colors: ["Negro","Azul","Blanco"],
+sizes: ["8","10","12"],
+min: 50
+}
+],
+plasticos: [
+{
+name: "Cierre plástico 5",
+colors: ["Negro","Gris"],
+sizes: ["50 cm","60 cm"],
+min: 50
+}
+],
+botones: [
+{
+name: "Botón metálico 18mm",
+colors: ["Níquel","Dorado"],
+sizes: ["18 mm"],
+min: 100
+}
+]
+};
+
+let currentCategory = null;
+let order = [];
+
+function loadCategory(cat) {
+currentCategory = cat;
+document.getElementById("categoryTitle").innerText = cat.toUpperCase();
+const container = document.getElementById("products");
+container.innerHTML = "";
+
+catalog[cat].forEach((p,i)=>{
+container.innerHTML += `
+<div class="product" onclick="openProduct(${i})">
+<b>${p.name}</b><br>
+Mínimo: ${p.min} unidades
+</div>`;
+});
+}
+
+function openProduct(index) {
+const p = catalog[currentCategory][index];
+const color = prompt("Elegí color:\n"+p.colors.join(", "));
+if(!color) return;
+
+const size = prompt("Elegí medida:\n"+p.sizes.join(", "));
+if(!size) return;
+
+let qty = prompt("Cantidad (mínimo "+p.min+")");
+if(!qty || qty < p.min) {
+alert("Cantidad mínima: "+p.min);
+return;
+}
+
+addToOrder(p.name, color, size, qty);
+}
+
+function addToOrder(name,color,size,qty){
+const item = `${name} - ${color} - ${size} - ${qty} unidades`;
+order.push(item);
+updateOrder();
+}
+
+function updateOrder(){
+const list = document.getElementById("orderList");
+list.innerHTML = "";
+order.forEach(i=>{
+list.innerHTML += "<div>"+i+"</div>";
+});
+
+document.getElementById("orderText").value =
+"PEDIDO MAYORISTA\n\n" + order.join("\n");
+}
+
+function copyText(){
+const text = document.getElementById("orderText");
+text.select();
+document.execCommand("copy");
+alert("Texto copiado");
+}
+
+function sendWhatsApp(){
+const number = prompt("Ingresá tu número WhatsApp con código país. Ej: 54911XXXXXXX");
+if(!number) return;
+const text = encodeURIComponent(document.getElementById("orderText").value);
+window.open(`https://wa.me/${number}?text=${text}`);
+}
+
+</script>
+
+</body>
+</html>
