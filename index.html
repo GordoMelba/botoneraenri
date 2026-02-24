@@ -1624,8 +1624,45 @@ function clearOrder(){
   toast("Pedido limpiado");
 }
 
+<script>
 
-const MI_NUMERO = "5491158390513"; 
+// ================= UTIL =================
+const $ = (id) => document.getElementById(id);
+
+let order = [];
+
+// ================= TOAST =================
+function toast(msg){
+  alert(msg);
+}
+
+// ================= PEDIDO =================
+function updateOrder(){
+  const textArea = $("orderText");
+  if(!textArea) return;
+
+  if(order.length === 0){
+    textArea.value = "";
+    return;
+  }
+
+  let text = "PEDIDO MAYORISTA\n\n";
+
+  order.forEach(item=>{
+    text += `${item.nombre} - ${item.color} - ${item.medida} - ${item.cantidad} unidades\n`;
+  });
+
+  textArea.value = text;
+}
+
+function clearOrder(){
+  order = [];
+  updateOrder();
+  toast("Pedido limpiado");
+}
+
+// ================= WHATSAPP =================
+const MI_NUMERO = "5491158390513";
 
 function sendWhatsAppPropio(){
   if(order.length === 0){
@@ -1650,15 +1687,65 @@ function sendWhatsAppOtro(){
   const text = encodeURIComponent($("orderText").value);
   window.open(`https://wa.me/${limpio}?text=${text}`, "_blank");
 }
-  if(!number) return;
-  const text = encodeURIComponent($("orderText").value);
-  window.open(`https://wa.me/${number.replace(/\D/g,"")}?text=${text}`, "_blank");
+
+// ================= MODAL PRODUCTO =================
+function openProductModal(product){
+  const color = prompt(`Elegí color:\n${product.colores.join(", ")}`);
+  if(!color) return;
+
+  const medida = prompt(`Elegí medida:\n${product.medidas.join(", ")}`);
+  if(!medida) return;
+
+  const cantidad = prompt("Ingresá cantidad:");
+  if(!cantidad) return;
+
+  order.push({
+    nombre: product.nombre,
+    color: color,
+    medida: medida,
+    cantidad: cantidad
+  });
+
+  updateOrder();
 }
 
-setCounts();
-updateOrder();
-loadCategory("metalicos");
-</script>
+// ================= EJEMPLO CARGA PRODUCTOS =================
+const catalog = {
+  metalicos: [
+    {
+      nombre: "Cierre bronce 4.5",
+      colores: ["negro","gris","azul"],
+      medidas: ["8","10","12"]
+    }
+  ],
+  plasticos: [
+    {
+      nombre: "Cierre plástico 5",
+      colores: ["negro","gris"],
+      medidas: ["60","70","80"]
+    }
+  ]
+};
 
-</body>
-</html>
+function loadCategory(cat){
+  const container = $("products");
+  if(!container) return;
+
+  container.innerHTML = "";
+
+  catalog[cat].forEach(prod=>{
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "15px";
+    div.style.marginBottom = "10px";
+    div.style.cursor = "pointer";
+    div.innerHTML = `<strong>${prod.nombre}</strong>`;
+    div.onclick = ()=> openProductModal(prod);
+    container.appendChild(div);
+  });
+}
+
+// ================= INIT =================
+loadCategory("metalicos");
+
+</script>
