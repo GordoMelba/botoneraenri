@@ -244,6 +244,33 @@
       transition: opacity .18s ease, transform .18s ease; z-index: 1000;
     }
     .toast.show{ opacity:1; transform: translateX(-50%) translateY(-4px); }
+
+    /* ================= MOBILE FIX ================= */
+
+@media (max-width: 900px){
+
+  .container{
+    flex-direction: column;   /* 🔥 apila todo */
+    height: auto;
+  }
+
+  .sidebar{
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .main{
+    width: 100%;
+  }
+
+  .order{
+    width: 100%;              /* 🔥 que no tenga ancho fijo */
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+
+}
   </style>
 </head>
 
