@@ -371,6 +371,7 @@
     <div class="category" id="cat-elasticos" onclick="loadCategory('elasticos')">Elásticos / Cordones <small id="cnt-elasticos"></small></div>
     <div class="category" id="cat-cintas" onclick="loadCategory('cintas')">Cintas <small id="cnt-cintas"></small></div>
     <div class="category" id="cat-avios" onclick="loadCategory('avios')">Avíos y accesorios <small id="cnt-avios"></small></div>
+    <div class="category" id="cat-hilos" onclick="loadCategory('hilos')"> Hilos <small id="cnt-hilos"></small> </div>
   </div>
 
   <div class="main">
@@ -826,7 +827,7 @@ function qtyOptionsForCategory(cat){
 }
 
 function setCounts(){
-  const keys = ["metalicos","plasticos","invisibles","cursores","botones","elasticos","cintas","avios"];
+  const keys = ["metalicos","plasticos","invisibles","cursores","botones","elasticos","cintas","avios","hilos"];
   keys.forEach(k=>{
     const el = $("cnt-"+k);
     if(!el) return;
