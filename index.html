@@ -3,39 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Catálogo Botonera Enri - Pedido por WhatsApp </title>
+  <title>Catálogo Botonera Enri - Pedido por WhatsApp</title>
+
   <style>
-  :root{
-  --bg:#f4f6f9;
-  --panel:#ffffff;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --text:#1f2937;
-  --line:#e5e7eb;
-  --accent:#2563eb;
-  --accent2:#1d4ed8;
-  --danger:#dc2626;
-  --warning:#d97706;
-  --shadow: 0 8px 20px rgba(0,0,0,.08);
-  --radius:18px;
-  --radius2:14px;
-}
+    :root{
+      --bg:#f7f7f7;
+      --panel:#ffffff;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#1f2937;
+      --line:#e5e7eb;
+      --accent:#2563eb;
+      --accent2:#1d4ed8;
+      --danger:#dc2626;
+      --warning:#d97706;
+
+      --shadow: 0 8px 20px rgba(0,0,0,.08);
+      --shadowSoft: 0 4px 12px rgba(0,0,0,.05);
+
+      --radius:18px;
+      --radius2:14px;
+    }
+
     *{box-sizing:border-box}
     body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background:#f7f7f7;
-  color:#1f2937;
-
-}
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: var(--bg);
+      color: var(--text);
+    }
     a{color:inherit}
+
+    /* Topbar */
     .topbar{
-  position:sticky;
-  top:0;
-  z-index:5;
-  background:#ffffff;
-  border-bottom: 1px solid #e5e7eb;
-}
+      position:sticky;
+      top:0;
+      z-index:5;
+      background:#ffffff;
+      border-bottom:1px solid var(--line);
+    }
     .topbar .inner{
       max-width:1200px;
       margin:0 auto;
@@ -45,103 +51,79 @@
       align-items:center;
       justify-content:space-between;
     }
-    .brand{
-      display:flex; gap:12px; align-items:center;
-    }
+    .brand{display:flex; gap:12px; align-items:center;}
     .logo{
       width:38px;height:38px;border-radius:12px;
       background: linear-gradient(135deg, rgba(77,163,255,.9), rgba(34,197,94,.85));
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadowSoft);
     }
-    .brand h1{
-      margin:0;
-      font-size:16px;
-      letter-spacing:.2px;
-      line-height:1.1;
-    }
-    .brand p{
-      margin:3px 0 0 0;
-      font-size:12px;
-      color:var(--muted);
-    }
-    .status{
-      display:flex; gap:10px; align-items:center;
-      font-size:12px; color:var(--muted);
-    }
+    .brand h1{margin:0;font-size:16px;letter-spacing:.2px;line-height:1.1;}
+    .brand p{margin:3px 0 0 0;font-size:12px;color:var(--muted);}
+    .status{display:flex; gap:10px; align-items:center;font-size:12px;color:var(--muted);}
     .dot{width:8px;height:8px;border-radius:99px;background:var(--warning);box-shadow:0 0 0 6px rgba(245,158,11,.12)}
-    .dot.ok{background:var(--accent2);box-shadow:0 0 0 6px rgba(34,197,94,.12)}
-    .wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:16px;
-    }
+    .dot.ok{background:#22c55e;box-shadow:0 0 0 6px rgba(34,197,94,.12)}
 
-    .layout{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-    }
-    .left{
-      flex: 1 1 auto;
-      min-width:0;
-    }
-    .right{
-      width:360px;
-      flex: 0 0 360px;
-      position:sticky;
-      top:76px;
-    }
+    /* Layout */
+    .wrap{max-width:1200px;margin:0 auto;padding:16px;}
+    .layout{display:flex;gap:14px;align-items:flex-start;}
+    .left{flex:1 1 auto;min-width:0;}
+    .right{width:360px;flex:0 0 360px;position:sticky;top:76px;}
 
     .panel{
-  background:#ffffff;
-  border:1px solid #e5e7eb;
-  border-radius: var(--radius);
-  box-shadow: 0 4px 12px rgba(0,0,0,.04);
-  overflow:hidden;
-}
-
-    .catbar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  padding:12px;
-  border-bottom:1px solid #e5e7eb;
-  background:#ffffff;
-}
-    
-   .pill{
-  padding:10px 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#ffffff;
-  color:var(--text);
-  font-size:13px;
-  cursor:pointer;
-  display:flex;
-  gap:8px;
-  align-items:center;
-  user-select:none;
-  transition: .15s ease;
-}
-
-.pill:hover{
-  background:#f3f4f6;
-}
-
-.pill.active{
-  background: var(--accent);
-  color:#ffffff;
-  border-color: var(--accent);
-}
-    .count{
-      font-size:11px;
-      color:var(--muted);
+      background:var(--panel);
       border:1px solid var(--line);
-      padding:2px 8px;
-      border-radius:999px;
-      background: rgba(0,0,0,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadowSoft);
+      overflow:hidden;
     }
 
+    /* Category bar */
+    .catbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      padding:12px;
+      border-bottom:1px solid var(--line);
+      background:#ffffff;
+    }
+
+    .pill{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#ffffff;
+      color:var(--text);
+      font-size:13px;
+      cursor:pointer;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      user-select:none;
+      transition:.15s ease;
+    }
+    .pill:hover{transform: translateY(-1px); background:#f3f4f6;}
+    .pill.active{
+      background: var(--accent);
+      border-color: var(--accent);
+      color:#fff;
+    }
+    .count{
+      font-size:11px;
+      color:inherit;
+      border:1px solid rgba(255,255,255,.35);
+      padding:2px 8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.18);
+      opacity:.95;
+    }
+    /* cuando no está activa, que el count se vea “suave” */
+    .pill:not(.active) .count{
+      color:var(--muted);
+      border-color: var(--line);
+      background:#f9fafb;
+    }
+
+    /* Header + search */
     .head{
       padding:14px 14px 10px 14px;
       display:flex;
@@ -149,27 +131,21 @@
       justify-content:space-between;
       gap:12px;
     }
-    .head h2{
-      margin:0;
-      font-size:15px;
-      letter-spacing:.4px;
-    }
-    .head .sub{
-      margin:6px 0 0 0;
-      font-size:12px;
-      color:var(--muted);
-    }
+    .head h2{margin:0;font-size:15px;letter-spacing:.4px;}
+    .head .sub{margin:6px 0 0 0;font-size:12px;color:var(--muted);}
     .search{
       width:280px;
       max-width: 48vw;
       padding:10px 12px;
-      border-radius: 12px;
+      border-radius:12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      background:#ffffff;
       color:var(--text);
       outline:none;
     }
+    .search:focus{border-color: rgba(37,99,235,.55); box-shadow:0 0 0 4px rgba(37,99,235,.12);}
 
+    /* Product grid */
     .grid{
       padding:12px;
       display:grid;
@@ -177,25 +153,20 @@
       gap:12px;
     }
     .card{
-      border: 1px solid #e5e7eb;
-      background: #ffffff;
+      border:1px solid var(--line);
+      background:#ffffff;
       border-radius: var(--radius2);
       overflow:hidden;
       cursor:pointer;
-      transition: .12s ease;
+      transition:.18s ease;
       display:flex;
       flex-direction:column;
       min-height: 210px;
     }
-    .card:hover{transform: translateY(-2px)}
-    .img{
-      position:relative;
-      height:120px;
-      background: rgba(0,0,0,.2);
-      overflow:hidden;
-    }
+    .card:hover{transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,.06);}
+    .img{position:relative;height:120px;background:#eef2f7;overflow:hidden;}
     .img img{
-      width:100%; height:100%;
+      width:100%;height:100%;
       object-fit:cover;
       display:block;
       filter: saturate(1.05);
@@ -204,11 +175,11 @@
       position:absolute;
       top:10px; left:10px;
       font-size:12px;
-      background: rgba(0,0,0,.55);
-      border:1px solid var(--line);
+      background: rgba(17,24,39,.75);
+      border:1px solid rgba(255,255,255,.18);
       padding:4px 8px;
       border-radius:999px;
-      color:var(--muted);
+      color:#ffffff;
       backdrop-filter: blur(8px);
     }
     .body{
@@ -218,8 +189,8 @@
       gap:8px;
       flex:1;
     }
-    .title{font-weight:700; font-size:14px; line-height:1.2}
-    .desc{font-size:12px; color:var(--muted); line-height:1.25}
+    .title{font-weight:700;font-size:14px;line-height:1.2;}
+    .desc{font-size:12px;color:var(--muted);line-height:1.25;}
     .meta{
       margin-top:auto;
       display:flex;
@@ -234,144 +205,128 @@
       border:1px solid var(--line);
       padding:4px 8px;
       border-radius:999px;
-      background: rgba(255,255,255,.04);
+      background:#f9fafb;
+      color:var(--muted);
     }
 
     /* Right panel */
-   .right .top{
-  padding:14px;
-  border-bottom:1px solid #e5e7eb;
-  background:#ffffff;
-}
-    
-    .right h3{margin:0; font-size:14px}
-    .right .hint{margin:6px 0 0 0; font-size:12px; color:var(--muted)}
-    .field{
-      margin-top:10px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
+    .right .top{
+      padding:14px;
+      border-bottom:1px solid var(--line);
+      background:#ffffff;
     }
-    .label{
-      font-size:12px;
-      color:var(--muted);
-    }
+    .right h3{margin:0;font-size:14px}
+    .right .hint{margin:6px 0 0 0;font-size:12px;color:var(--muted)}
+
+    .field{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+    .label{font-size:12px;color:var(--muted);}
     .input{
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      background:#ffffff;
       color:var(--text);
       outline:none;
+      transition:.15s ease;
     }
-    .orderBox{
-      padding:14px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
+    .input:focus{border-color: rgba(37,99,235,.55); box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+    .input.err{
+      border-color: rgba(220,38,38,.65);
+      box-shadow: 0 0 0 4px rgba(220,38,38,.10);
     }
+
+    .orderBox{padding:14px;display:flex;flex-direction:column;gap:10px;}
     .orderList{
-  border:1px solid #e5e7eb;
-  border-radius:14px;
-  padding:10px;
-  background:#f9fafb;
-  min-height:120px;
-  max-height:220px;
-  overflow:auto;
-}
-    <div id="orderTotal" style="font-weight:700; font-size:16px; margin-top:6px;"></div>
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      background:#f9fafb;
+      min-height:120px;
+      max-height:220px;
+      overflow:auto;
+    }
     .orderLine{
       padding:8px 8px;
-      border-bottom:1px dashed rgba(255,255,255,.10);
+      border-bottom:1px dashed #dbe2ea;
       font-size:12px;
       color:var(--text);
       line-height:1.25;
     }
     .orderLine:last-child{border-bottom:none}
+
+    .orderTotal{
+      font-weight:800;
+      font-size:15px;
+      padding:10px 0 0 0;
+    }
+
+    .boxTitle{
+      font-size:12px;
+      color:var(--muted);
+      margin:6px 0 0 0;
+      letter-spacing:.2px;
+    }
     textarea{
-  width:100%;
-  resize:none;
-  border-radius:14px;
-  border:1px solid #e5e7eb;
-  background:#ffffff;
-  color:#1f2937;
-  padding:10px;
-  min-height:160px;
-  outline:none;
-  font-size:12px;
-  line-height:1.25;
-}
-   .btnrow{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
+      width:100%;
+      resize:none;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#ffffff;
+      color:var(--text);
+      padding:10px;
+      min-height:140px;
+      outline:none;
+      font-size:12px;
+      line-height:1.25;
+    }
 
-.btn{
-  padding:12px 14px;
-  border-radius: var(--radius2);
-  border:1px solid var(--line);
-  background:#ffffff;
-  color:var(--text);
-  cursor:pointer;
-  font-size:14px;
-  font-weight:500;
-  transition: all .18s ease;
-  flex:1;
-  text-align:center;
-}
+    /* Buttons */
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;}
+    .btn{
+      padding:12px 14px;
+      border-radius: var(--radius2);
+      border:1px solid var(--line);
+      background:#ffffff;
+      color:var(--text);
+      cursor:pointer;
+      font-size:14px;
+      font-weight:600;
+      transition: all .18s ease;
+      flex:1;
+      text-align:center;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.06);}
+    .btn.primary{
+      background: var(--accent);
+      border-color: var(--accent);
+      color:#ffffff;
+    }
+    .btn.primary:hover{background: var(--accent2); border-color: var(--accent2);}
+    .btn.danger{
+      background:#ffffff;
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    .btn.danger:hover{background: var(--danger); color:#ffffff;}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
 
-/* Hover general limpio */
-.btn:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,.06);
-}
-
-/* Botón principal (acción fuerte) */
-.btn.primary{
-  background: var(--accent);
-  border-color: var(--accent);
-  color:#ffffff;
-}
-
-.btn.primary:hover{
-  background: var(--accent2);
-  border-color: var(--accent2);
-}
-
-/* Botón peligro (vaciar, borrar, etc) */
-.btn.danger{
-  background:#ffffff;
-  border-color:#dc2626;
-  color:#dc2626;
-}
-
-.btn.danger:hover{
-  background:#dc2626;
-  color:#ffffff;
-}
-
-/* Deshabilitado */
-.btn:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-  transform:none;
-  box-shadow:none;
-}
-    /* Modal */
+    /* Modal overlay */
     .overlay{
       display:none;
       position:fixed; inset:0;
-      background: rgba(0,0,0,.62);
+      background: rgba(0,0,0,.55);
       z-index:20;
       align-items:center;
       justify-content:center;
       padding:16px;
     }
-    .modal{
+
+    /* Light modal (coherente con tu web clara) */
+    .modal, .cModal{
       width: min(980px, 96vw);
-      background: rgba(15,27,49,.92);
-      border: 1px solid var(--line);
+      background:#ffffff;
+      border:1px solid var(--line);
       border-radius: 22px;
       box-shadow: var(--shadow);
       overflow:hidden;
@@ -382,28 +337,27 @@
     .mTop{
       padding:14px 16px;
       border-bottom:1px solid var(--line);
-      background: rgba(18,36,71,.55);
+      background:#ffffff;
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:12px;
     }
-    .mTop .tt{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width:0;
-    }
-    .mTitle{margin:0; font-size:16px}
-    .mSub{margin:0; font-size:12px; color:var(--muted); line-height:1.25}
+    .mTop .tt{display:flex;flex-direction:column;gap:6px;min-width:0;}
+    .mTitle{margin:0;font-size:16px}
+    .mSub{margin:0;font-size:12px;color:var(--muted);line-height:1.25}
+
     .x{
       width:38px;height:38px;border-radius: 12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.05);
+      background:#ffffff;
       cursor:pointer;
       display:grid; place-items:center;
       user-select:none;
+      transition:.15s ease;
     }
+    .x:hover{background:#f3f4f6}
+
     .mBody{
       padding:16px;
       display:grid;
@@ -414,7 +368,7 @@
     .mLeft{
       border:1px solid var(--line);
       border-radius: 18px;
-      background: rgba(0,0,0,.14);
+      background:#f9fafb;
       overflow:hidden;
       min-height: 280px;
     }
@@ -422,6 +376,7 @@
       width:100%; height:230px;
       object-fit:cover;
       display:block;
+      background:#eef2f7;
     }
     .mLeft .mini{
       padding:12px;
@@ -437,21 +392,15 @@
       border:1px solid var(--line);
       padding:4px 8px;
       border-radius:999px;
-      background: rgba(255,255,255,.04);
+      background:#ffffff;
     }
-    .mini .stock{
-      font-size:12px;
-      color:var(--muted);
-    }
-    .mRight{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+    .mini .stock{font-size:12px;color:var(--muted);}
+
+    .mRight{display:flex;flex-direction:column;gap:12px;}
     .block{
       border:1px solid var(--line);
       border-radius: 18px;
-      background: rgba(0,0,0,.14);
+      background:#ffffff;
       padding:12px;
     }
     .bTitle{
@@ -460,27 +409,24 @@
       margin:0 0 10px 0;
       letter-spacing:.3px;
     }
-    .opts{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
+    .opts{display:flex;flex-wrap:wrap;gap:8px;}
     .opt{
       padding:8px 10px;
       border-radius: 999px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      background:#ffffff;
       cursor:pointer;
       font-size:13px;
       user-select:none;
       transition:.12s ease;
     }
-    .opt:hover{transform: translateY(-1px)}
+    .opt:hover{transform: translateY(-1px); background:#f3f4f6;}
     .opt.selected{
-      border-color: rgba(77,163,255,.55);
-      background: rgba(77,163,255,.16);
-      box-shadow: 0 0 0 4px rgba(77,163,255,.12);
+      border-color: rgba(37,99,235,.55);
+      background: rgba(37,99,235,.10);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10);
     }
+
     .row{
       display:flex;
       gap:10px;
@@ -495,49 +441,39 @@
       flex: 1;
       min-width: 220px;
     }
-    .qtyNote{font-size:12px; color:var(--muted)}
+    .qtyNote{font-size:12px;color:var(--muted)}
     select, input[type="number"]{
       padding:10px 12px;
       border-radius: 12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
+      background:#ffffff;
       color:var(--text);
       outline:none;
     }
-    .priceBox{
-      text-align:right;
-      min-width: 200px;
+    select:focus, input[type="number"]:focus{
+      border-color: rgba(37,99,235,.55);
+      box-shadow:0 0 0 4px rgba(37,99,235,.12);
     }
-    .priceBox .u{font-size:12px; color:var(--muted)}
-    .priceBox .p{font-size:16px; font-weight:800; margin-top:4px}
-    .priceBox .t{font-size:12px; color:var(--muted); margin-top:4px}
-    .warn{
-      font-size:12px;
-      color: rgba(245,158,11,.95);
-    }
-    .dangerText{color: rgba(239,68,68,.95)}
+
+    .priceBox{text-align:right;min-width: 200px;}
+    .priceBox .u{font-size:12px;color:var(--muted)}
+    .priceBox .p{font-size:16px;font-weight:900;margin-top:4px}
+    .priceBox .t{font-size:12px;color:var(--muted);margin-top:4px}
+
+    .warn{font-size:12px;color: rgba(217,119,6,.95);}
+    .dangerText{color: rgba(220,38,38,.95);}
     .smallBtn{
       padding:8px 10px;
       border-radius: 12px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.05);
+      background:#ffffff;
       font-size:12px;
       cursor:pointer;
       user-select:none;
     }
+    .smallBtn:hover{background:#f3f4f6}
 
-    /* Color chart modal */
-    .cModal{
-      width:min(980px, 96vw);
-      background: rgba(15,27,49,.92);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      max-height: 88vh;
-      display:flex;
-      flex-direction:column;
-    }
+    /* Color chart modal (light) */
     .cBody{
       padding:14px;
       overflow:auto;
@@ -548,7 +484,7 @@
     .carousel{
       border:1px solid var(--line);
       border-radius: 18px;
-      background: rgba(0,0,0,.14);
+      background:#f9fafb;
       overflow:hidden;
       position:relative;
     }
@@ -556,7 +492,7 @@
       width:100%;
       max-height: 62vh;
       object-fit: contain;
-      background: rgba(0,0,0,.2);
+      background:#ffffff;
       display:block;
     }
     .navBtn{
@@ -564,18 +500,15 @@
       transform: translateY(-50%);
       width:42px;height:42px;border-radius: 14px;
       border:1px solid var(--line);
-      background: rgba(0,0,0,.45);
+      background: rgba(255,255,255,.90);
       cursor:pointer;
       display:grid; place-items:center;
       user-select:none;
     }
+    .navBtn:hover{background:#ffffff}
     .navBtn.left{left:10px}
     .navBtn.right{right:10px}
-    .thumbs{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap;}
     .thumb{
       width:72px;height:52px;
       border-radius: 12px;
@@ -583,9 +516,13 @@
       overflow:hidden;
       cursor:pointer;
       opacity:.75;
-      background: rgba(0,0,0,.2);
+      background:#f9fafb;
     }
-    .thumb.selected{opacity:1; border-color: rgba(77,163,255,.55); box-shadow: 0 0 0 4px rgba(77,163,255,.12)}
+    .thumb.selected{
+      opacity:1;
+      border-color: rgba(37,99,235,.55);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+    }
     .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 
     /* Toast */
@@ -597,22 +534,21 @@
       padding:10px 12px;
       border-radius: 999px;
       border:1px solid var(--line);
-      background: rgba(0,0,0,.55);
-      color:var(--text);
+      background: rgba(17,24,39,.92);
+      color:#ffffff;
       font-size:13px;
       display:none;
       z-index:30;
-      backdrop-filter: blur(10px);
     }
     .toast.show{display:block}
 
     /* Responsive */
     @media (max-width: 980px){
       .grid{grid-template-columns: 1fr;}
-      .right{width:100%; flex:1 1 auto; position:static}
+      .right{width:100%;flex:1 1 auto;position:static}
       .layout{flex-direction:column}
-      .search{width:100%; max-width:none}
-      .mBody{grid-template-columns: 1fr; }
+      .search{width:100%;max-width:none}
+      .mBody{grid-template-columns: 1fr;}
       .priceBox{text-align:left}
       .qtyWrap{min-width:0}
     }
@@ -625,7 +561,7 @@
       <div class="brand">
         <div class="logo"></div>
         <div>
-          <h1>Catálogo Botonera Enri→ Pedido por WhatsApp</h1>
+          <h1>Catálogo Botonera Enri → Pedido por WhatsApp</h1>
           <p>Elegí productos, armá el texto y enviá el pedido.</p>
         </div>
       </div>
@@ -660,10 +596,10 @@
         <div class="panel">
           <div class="top">
             <h3>Pedido</h3>
-            <p class="hint">Antes de enviar, completá el nombre del cliente.</p>
+            <p class="hint">Podés armar el pedido sin nombre. El nombre es obligatorio solo para enviar por WhatsApp.</p>
 
             <div class="field">
-              <div class="label">Nombre del cliente (obligatorio)</div>
+              <div class="label">Nombre del cliente (obligatorio para enviar)</div>
               <input id="clientName" class="input" placeholder="Ej: Juan Pérez" />
             </div>
           </div>
@@ -671,14 +607,21 @@
           <div class="orderBox">
             <div class="orderList" id="orderList"></div>
 
-            <textarea id="orderText" readonly></textarea>
+            <div class="orderTotal" id="orderTotal"></div>
+
+            <div class="boxTitle">DETALLE (WhatsApp)</div>
+            <textarea id="orderDetailText" readonly></textarea>
+
+            <div class="boxTitle">RESUMEN CÓDIGOS (para sistema)</div>
+            <textarea id="orderCodesText" readonly></textarea>
 
             <div class="btnrow">
-              <button class="btn" onclick="copyText()">Copiar texto</button>
-              <button class="btn danger" onclick="clearOrder()">Vaciar</button>
+              <button class="btn" onclick="copyDetail()">Copiar detalle</button>
+              <button class="btn" onclick="copyCodes()">Copiar códigos</button>
             </div>
 
             <div class="btnrow">
+              <button class="btn danger" onclick="clearOrder()">Vaciar</button>
               <button class="btn primary" id="btnWA" onclick="sendWhatsApp()" disabled>Enviar por WhatsApp</button>
             </div>
           </div>
@@ -790,20 +733,20 @@
     const MI_NUMERO = "5491158390513";
 
     // ====== STATE ======
-    let rows = [];                 // filas del sheet (variantes)
-    let categories = [];           // lista de categorías
-    let productsByCat = new Map(); // cat -> array productos (agrupados)
+    let rows = [];
+    let categories = [];
+    let productsByCat = new Map();
     let activeCat = null;
     let searchTerm = "";
 
     // Pedido
     let order = []; // items {displayLine, codeLine, qty, unitPrice, lineTotal}
-    let currentProduct = null;     // producto agrupado
+    let currentProduct = null;
     let selectedQuality = null;
     let selectedSize = null;
     let selectedColor = null;
-    let selectedVariant = null;    // fila encontrada
-    let acceptLonger = null;       // boolean o null
+    let selectedVariant = null;
+    let acceptLonger = null;
 
     // Carta de colores
     let chartImages = [];
@@ -815,7 +758,7 @@
       const t = $("toast");
       t.textContent = msg;
       t.classList.add("show");
-      setTimeout(()=>t.classList.remove("show"), 1400);
+      setTimeout(()=>t.classList.remove("show"), 1600);
     }
 
     // ====== CSV PARSER (maneja comillas) ======
@@ -823,12 +766,8 @@
       const out = [];
       let i=0, field="", row=[], inQuotes=false;
 
-      function pushField(){
-        row.push(field);
-        field="";
-      }
+      function pushField(){ row.push(field); field=""; }
       function pushRow(){
-        // evitar filas vacías
         const allEmpty = row.every(v => (v ?? "").trim()==="");
         if(!allEmpty) out.push(row);
         row=[];
@@ -841,30 +780,21 @@
           if(c === '"'){
             if(text[i+1] === '"'){ field += '"'; i++; }
             else inQuotes = false;
-          } else {
-            field += c;
-          }
+          } else field += c;
         } else {
-          if(c === '"'){ inQuotes = true; }
-          else if(c === ','){ pushField(); }
-          else if(c === '\n'){
-            pushField(); pushRow();
-          } else if(c === '\r'){
-            // ignore
-          } else {
-            field += c;
-          }
+          if(c === '"') inQuotes = true;
+          else if(c === ',') pushField();
+          else if(c === '\n'){ pushField(); pushRow(); }
+          else if(c === '\r'){ /* ignore */ }
+          else field += c;
         }
         i++;
       }
-      // final
       pushField(); pushRow();
       return out;
     }
 
-    function normalizeKey(s){
-      return String(s ?? "").trim();
-    }
+    function normalizeKey(s){ return String(s ?? "").trim(); }
 
     function toNumber(x){
       const n = Number(String(x ?? "").replace(",", ".").trim());
@@ -873,7 +803,6 @@
 
     function formatMoney(n){
       if(!Number.isFinite(n)) return "—";
-      // formato simple AR (sin depender de locale)
       return "$ " + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
@@ -887,7 +816,7 @@
       return "https://placehold.co/1200x800?text=" + encodeURIComponent(name || "Producto");
     }
 
-    // ====== REGLAS AUTOMÁTICAS (según lo que venías usando) ======
+    // ====== REGLAS AUTOMÁTICAS ======
     function defaultsForCategory(cat){
       const c = String(cat || "").toLowerCase();
       if(["metalicos","plasticos","invisibles","cursores"].includes(c)){
@@ -905,7 +834,6 @@
     function parseRule(ruleStr){
       const r = String(ruleStr || "").trim().toLowerCase();
       if(!r || r === "libre") return null;
-      // formato: a-b:step|c-d:step
       const parts = r.split("|").map(x=>x.trim()).filter(Boolean);
       const ranges = [];
       for(const p of parts){
@@ -921,49 +849,37 @@
     }
 
     function maxAllowedByRule(ranges, stock){
-      // si hay rangos, el máximo teórico es el máximo b, pero nunca superar stock
       const maxB = Math.max(...ranges.map(x=>x.b));
       return Math.min(stock, maxB);
     }
 
     function stepForQty(ranges, q){
-      // devuelve el step según en qué rango cae q
       for(const rr of ranges){
         if(q >= rr.a && q <= rr.b) return rr.step;
       }
-      // si está fuera, usar step del último
       return ranges[ranges.length-1].step;
     }
 
     function generateQtyOptions(minimo, regla, stock){
       const ranges = parseRule(regla);
       if(!Number.isFinite(stock) || stock <= 0) return [];
-
-      if(!ranges){
-        // libre: lo resolvemos con input number
-        return null;
-      }
+      if(!ranges) return null; // libre => input number
 
       const max = maxAllowedByRule(ranges, stock);
       const opts = [];
-      // generar desde minimo hasta max, respetando step por rango
       let q = Math.max(minimo, ranges[0].a);
-      // ajustar q al múltiplo del step del rango actual si hace falta
+
       while(q <= max){
         const st = stepForQty(ranges, q);
-        // asegurar múltiplo del step desde 0
         if(q % st === 0 || q === minimo){
           if(q >= minimo) opts.push(q);
           q += st;
-        } else {
-          q += 1;
-        }
+        } else q += 1;
       }
-      // filtrar > stock y asegurar mínimo
       return opts.filter(x => x >= minimo && x <= stock);
     }
 
-    // ====== CARGA Y ARMADO DEL CATÁLOGO ======
+    // ====== CARGA CATÁLOGO ======
     async function loadFromSheet(){
       $("netDot").classList.remove("ok");
       $("netText").textContent = "Cargando catálogo...";
@@ -972,20 +888,11 @@
         if(!res.ok) throw new Error("No se pudo leer la hoja (HTTP "+res.status+")");
         const text = await res.text();
         const table = parseCSV(text);
-
         if(table.length < 2) throw new Error("La hoja CSV parece vacía.");
 
         const headers = table[0].map(h => normalizeKey(h));
         const idx = (name)=> headers.findIndex(h => h === name);
 
-        // headers esperados (los de tu plantilla)
-        const need = [
-          "categoria","producto","descripcion_producto","calidad","codigo_base",
-          "medida_cm","color","codigo_color","precio_unitario","stock_disponible",
-          "unidad","minimo","regla_cantidad","es_plastico","carta_colores"
-        ];
-
-        // construir objetos por fila
         rows = table.slice(1).map(r=>{
           const get = (col)=> {
             const j = idx(col);
@@ -1036,11 +943,9 @@
     }
 
     function buildIndex(){
-      // categorías
       const catSet = new Set(rows.map(r => String(r.categoria).trim()).filter(Boolean));
       categories = Array.from(catSet).sort((a,b)=>a.localeCompare(b, "es"));
 
-      // agrupar a productos
       productsByCat = new Map();
       for(const r of rows){
         const cat = String(r.categoria).trim();
@@ -1055,18 +960,15 @@
             descripcion: r.descripcion || "",
             image: buildPlaceholderImage(pName),
             carta_colores: r.carta_colores || "",
-            // variantes completas:
             variants: [],
           });
         }
         mapProd.get(pName).variants.push(r);
-        // carta colores: si una fila trae cartas y otra no, quedate con la que tiene
         if(r.carta_colores && !mapProd.get(pName).carta_colores){
           mapProd.get(pName).carta_colores = r.carta_colores;
         }
       }
 
-      // pasar a arrays por cat
       const newMap = new Map();
       for(const cat of categories){
         const prodMap = productsByCat.get(cat) || new Map();
@@ -1076,7 +978,6 @@
       productsByCat = newMap;
 
       renderCategoryBar();
-      // set default category
       activeCat = categories[0] || null;
       setActiveCategory(activeCat);
     }
@@ -1117,12 +1018,10 @@
       });
 
       for(const p of filtered){
-        // estadística
         const qualities = new Set(p.variants.map(v=>v.calidad));
         const sizes = new Set(p.variants.map(v=>String(v.medida_cm)));
         const colors = new Set(p.variants.map(v=>v.color));
 
-        // stock total (sumando variantes, solo para “idea”)
         const stocks = p.variants.map(v=>v.stock_disponible).filter(x=>Number.isFinite(x));
         const totalStock = stocks.length ? stocks.reduce((a,b)=>a+b,0) : null;
 
@@ -1169,15 +1068,9 @@
       $("mWarn").style.display = "none";
       $("btnAdd").disabled = true;
 
-      // carta de colores
       const imgs = parseColorChartUrls(p.carta_colores);
-      if(imgs.length){
-        $("btnColorChart").style.display = "inline-block";
-      } else {
-        $("btnColorChart").style.display = "none";
-      }
+      $("btnColorChart").style.display = imgs.length ? "inline-block" : "none";
 
-      // calidad
       const qWrap = $("mQualities");
       qWrap.innerHTML = "";
       const qList = Array.from(new Set(p.variants.map(v=>v.calidad))).sort((a,b)=>a.localeCompare(b,"es"));
@@ -1195,14 +1088,12 @@
         });
       }
 
-      // plásticos: mostrar pregunta obligatoria si alguna variante es_plastico true o la categoría es plasticos
       const isPlastic = (String(p.categoria).toLowerCase() === "plasticos") || p.variants.some(v=>v.es_plastico);
       $("blkLonger").style.display = isPlastic ? "block" : "none";
       $("optLongYes").classList.remove("selected");
       $("optLongNo").classList.remove("selected");
       acceptLonger = isPlastic ? null : false;
 
-      // construir opciones iniciales
       rebuildSizeOptions();
       rebuildColorOptions();
       updateVariantAndPricing();
@@ -1210,9 +1101,7 @@
       $("modalOverlay").style.display = "flex";
     }
 
-    function closeModal(){
-      $("modalOverlay").style.display = "none";
-    }
+    function closeModal(){ $("modalOverlay").style.display = "none"; }
     $("modalOverlay").addEventListener("click", (e)=>{ if(e.target.id === "modalOverlay") closeModal(); });
     window.addEventListener("keydown", (e)=>{ if(e.key === "Escape"){ closeModal(); closeColorChart(); } });
 
@@ -1231,7 +1120,7 @@
       selectedSize = String(sz);
       [...$("mSizes").children].forEach(x=>x.classList.remove("selected"));
       btn.classList.add("selected");
-      selectedColor = null; // para evitar combinación inexistente
+      selectedColor = null;
       rebuildColorOptions();
       updateVariantAndPricing();
     }
@@ -1254,7 +1143,6 @@
       const sizesWrap = $("mSizes");
       sizesWrap.innerHTML = "";
 
-      // filtrar por calidad si corresponde
       const vars = currentProduct.variants.filter(v=>{
         return selectedQuality ? v.calidad === selectedQuality : true;
       });
@@ -1304,14 +1192,10 @@
     function updateVariantAndPricing(){
       selectedVariant = findVariant();
 
-      // reset
       $("btnAdd").disabled = true;
       $("mWarn").style.display = "none";
 
       const isPlasticBlockShown = $("blkLonger").style.display !== "none";
-      if(isPlasticBlockShown && acceptLonger === null){
-        // todavía falta responder
-      }
 
       if(!selectedQuality || !selectedSize || !selectedColor){
         $("mCode").textContent = "Código: —";
@@ -1338,8 +1222,6 @@
       const base = String(selectedVariant.codigo_base || "").trim();
       const med = String(selectedVariant.medida_cm || "").trim();
       const colCode = String(selectedVariant.codigo_color || "").trim();
-
-      // Si no hay codigo_base o codigo_color, igual mostramos algo y te queda para completar después
       const fullCode = [base, med, colCode].filter(Boolean).join(".");
       $("mCode").textContent = "Código: " + (fullCode || "—");
 
@@ -1354,10 +1236,8 @@
       $("unitPriceLabel").textContent = "Precio unitario:";
       $("unitPriceValue").textContent = formatMoney(unitPrice);
 
-      // cantidad
       setupQtyControl(selectedVariant);
 
-      // validación agregar
       const needLonger = isPlasticBlockShown;
       const okLonger = !needLonger || (acceptLonger === true || acceptLonger === false);
 
@@ -1378,8 +1258,6 @@
       }
 
       $("btnAdd").disabled = !(okLonger && okPrice && okStock);
-
-      // total ítem
       updateLineTotal();
     }
 
@@ -1415,7 +1293,6 @@
       const opts = generateQtyOptions(minimo, regla, stock);
 
       if(opts === null){
-        // libre
         sel.style.display = "none";
         inp.style.display = "block";
         inp.min = String(minimo);
@@ -1443,12 +1320,8 @@
     function getSelectedQty(){
       const sel = $("qtySelect");
       const inp = $("qtyInput");
-      if(sel.style.display !== "none"){
-        return Number(sel.value);
-      }
-      if(inp.style.display !== "none"){
-        return Number(inp.value);
-      }
+      if(sel.style.display !== "none") return Number(sel.value);
+      if(inp.style.display !== "none") return Number(inp.value);
       return null;
     }
 
@@ -1471,13 +1344,6 @@
     function confirmAdd(){
       if(!selectedVariant) return;
 
-      const name = $("clientName").value.trim();
-      if(!name){
-        toast("Falta Nombre del cliente");
-        $("clientName").focus();
-        return;
-      }
-
       const stock = selectedVariant.stock_disponible;
       const unitPrice = selectedVariant.precio_unitario;
       const qty = getSelectedQty();
@@ -1494,6 +1360,7 @@
 
       const lineTotal = qty * unitPrice;
       const unit = selectedVariant.unidad || "unidades";
+
       const longerText = (String(currentProduct?.categoria).toLowerCase() === "plasticos" || selectedVariant.es_plastico)
         ? `\n¿Acepta medida más larga?: ${acceptLonger ? "Sí" : "No"}`
         : "";
@@ -1505,34 +1372,51 @@
   Unitario: ${formatMoney(unitPrice)}
   Total: ${formatMoney(lineTotal)}`;
 
-      const codeLine = `${fullCode || "—"} - ${qty} - ${formatMoney(unitPrice)} - ${formatMoney(lineTotal)}`;
+      // Resumen para sistema: CÓDIGO + CANTIDAD (y si querés, unitario/total lo dejamos también)
+      const codeLine = `${fullCode || "—"} - ${qty}`;
 
-      order.push({
-        displayLine,
-        codeLine,
-        qty,
-        unitPrice,
-        lineTotal
-      });
+      order.push({ displayLine, codeLine, qty, unitPrice, lineTotal });
 
       updateOrder();
-      closeModal();
+      closeModal();        // ✅ cierra automáticamente
       toast("Agregado al pedido");
     }
 
-    // ====== PEDIDO / WHATSAPP ======
+    // ====== PEDIDO / PANEL DERECHO ======
+    function buildWhatsAppMessage(client, detail, summary, totalGeneral){
+      return (
+`PEDIDO MAYORISTA
+Cliente: ${client || "—"}
+
+DETALLE
+${detail || "(sin ítems)"}
+
+-------------------------
+RESUMEN CÓDIGOS (para sistema)
+${summary || "(sin ítems)"}
+
+-------------------------
+TOTAL PEDIDO: ${formatMoney(totalGeneral)}
+`);
+    }
+
     function updateOrder(){
       const list = $("orderList");
       list.innerHTML = "";
 
       const client = $("clientName").value.trim();
 
+      // limpiar error visual si el usuario escribe
+      $("clientName").classList.remove("err");
+
       if(order.length === 0){
         list.innerHTML = `<div style="color:var(--muted);font-size:13px;">Todavía no agregaste productos.</div>`;
-        $("orderText").value = client
-          ? `PEDIDO MAYORISTA\nCliente: ${client}\n\n(Agregar ítems desde el catálogo)`
-          : `PEDIDO MAYORISTA\n\n(Completar nombre del cliente y agregar ítems)`;
         $("orderTotal").textContent = "";
+        $("orderDetailText").value = client
+          ? `Cliente: ${client}\n\n(Agregar ítems desde el catálogo)`
+          : `(Agregar ítems desde el catálogo)`;
+        $("orderCodesText").value = `(Se genera automáticamente al agregar ítems)`;
+
         $("btnWA").disabled = true;
         return;
       }
@@ -1550,29 +1434,44 @@
       const detail = order.map(i=>i.displayLine).join("\n\n");
       const summary = order.map(i=>i.codeLine).join("\n");
 
-      $("orderText").value =
-`PEDIDO MAYORISTA
-Cliente: ${client || "—"}
+      // panel separado en 2 textareas
+      $("orderDetailText").value =
+`Cliente: ${client || "—"}
 
-DETALLE
 ${detail}
 
--------------------------
-RESUMEN CÓDIGOS (para sistema)
-${summary}
-
--------------------------
 TOTAL PEDIDO: ${formatMoney(totalGeneral)}
 `;
 
-      $("btnWA").disabled = !client;
+      $("orderCodesText").value = summary;
+
+      // botón WhatsApp: habilitado si hay ítems (nombre se valida al enviar)
+      $("btnWA").disabled = false;
+
+      // guardo mensaje completo para WA
+      window.__waText = buildWhatsAppMessage(client, detail, summary, totalGeneral);
     }
 
-    function copyText(){
-      const text = $("orderText");
-      text.select();
-      document.execCommand("copy");
-      toast("Texto copiado");
+    function copyToClipboard(text){
+      // fallback sencillo
+      if(navigator.clipboard?.writeText){
+        navigator.clipboard.writeText(text).then(()=>toast("Copiado")).catch(()=>toast("No se pudo copiar"));
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        toast("Copiado");
+      }
+    }
+
+    function copyDetail(){
+      copyToClipboard($("orderDetailText").value);
+    }
+    function copyCodes(){
+      copyToClipboard($("orderCodesText").value);
     }
 
     function clearOrder(){
@@ -1583,16 +1482,21 @@ TOTAL PEDIDO: ${formatMoney(totalGeneral)}
 
     function sendWhatsApp(){
       const client = $("clientName").value.trim();
-      if(!client){
-        toast("Falta Nombre del cliente");
-        $("clientName").focus();
-        return;
-      }
+
       if(order.length === 0){
         toast("El pedido está vacío");
         return;
       }
-      const text = encodeURIComponent($("orderText").value);
+
+      if(!client){
+        toast("Completá el nombre para enviar el pedido");
+        const inp = $("clientName");
+        inp.classList.add("err");
+        inp.focus();
+        return;
+      }
+
+      const text = encodeURIComponent(window.__waText || "");
       window.open(`https://wa.me/${MI_NUMERO}?text=${text}`, "_blank");
     }
 
@@ -1615,10 +1519,7 @@ TOTAL PEDIDO: ${formatMoney(totalGeneral)}
       renderChart();
       $("colorOverlay").style.display = "flex";
     }
-
-    function closeColorChart(){
-      $("colorOverlay").style.display = "none";
-    }
+    function closeColorChart(){ $("colorOverlay").style.display = "none"; }
     $("colorOverlay").addEventListener("click", (e)=>{ if(e.target.id === "colorOverlay") closeColorChart(); });
 
     function renderChart(){
