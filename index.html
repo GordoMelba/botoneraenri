@@ -1639,20 +1639,18 @@ TOTAL PEDIDO: ${formatMoney(totalGeneral)}
     // ====== INIT ======
     loadFromSheet().then(()=> updateOrder());
 
-    
-
-<div class="mobileCartBar" id="mobileCartBar" onclick="scrollToOrder()">
-  🧾 Ver pedido (<span id="mobileCartCount">0</span>)
-
-function scrollToOrder(){
+    function scrollToOrder(){
   const orderPanel = document.querySelector(".right");
   if(orderPanel){
     orderPanel.scrollIntoView({behavior:"smooth"});
   }
 }
-  
-</div>
+
+ 
     
   </script>
+  <div class="mobileCartBar" id="mobileCartBar" onclick="scrollToOrder()">
+  🧾 Ver pedido (<span id="mobileCartCount">0</span>)
+</div>
 </body>
 </html>
