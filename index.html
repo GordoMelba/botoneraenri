@@ -1532,6 +1532,7 @@
         $("orderText").value = client
           ? `PEDIDO MAYORISTA\nCliente: ${client}\n\n(Agregar ítems desde el catálogo)`
           : `PEDIDO MAYORISTA\n\n(Completar nombre del cliente y agregar ítems)`;
+        $("orderTotal").textContent = "";
         $("btnWA").disabled = true;
         return;
       }
@@ -1544,6 +1545,7 @@
       });
 
       const totalGeneral = order.reduce((a,b)=>a + (b.lineTotal || 0), 0);
+      $("orderTotal").textContent = "Total pedido: " + formatMoney(totalGeneral);
 
       const detail = order.map(i=>i.displayLine).join("\n\n");
       const summary = order.map(i=>i.codeLine).join("\n");
