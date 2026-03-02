@@ -65,7 +65,7 @@
 
     /* Layout */
     .wrap{max-width:1200px;margin:0 auto;padding:16px;}
-    .layout{display:flex;gap:14px;align-items:flex-start;}
+    .layout{display:flex;gap:26px;align-items:flex-start;}
     .left{flex:1 1 auto;min-width:0;}
     .right{width:360px;flex:0 0 360px;position:sticky;top:76px;}
 
@@ -76,6 +76,25 @@
       box-shadow: var(--shadowSoft);
       overflow:hidden;
     }
+
+    /* ===== Panel derecho destacado ===== */
+.right .panel{
+  border:1px solid #d1d5db;
+  border-radius:22px;
+  box-shadow: 0 20px 45px rgba(0,0,0,.15);
+  position:relative;
+}
+
+/* Franja superior */
+.right .panel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:6px;
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+}
 
     /* Category bar */
     .catbar{
@@ -255,10 +274,11 @@
     .orderLine:last-child{border-bottom:none}
 
     .orderTotal{
-      font-weight:800;
-      font-size:15px;
-      padding:10px 0 0 0;
-    }
+  font-weight:900;
+  font-size:18px;
+  padding:14px 0;
+  border-top:1px solid #e5e7eb;
+}
 
     .boxTitle{
       font-size:12px;
