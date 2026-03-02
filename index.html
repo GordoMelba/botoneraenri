@@ -608,6 +608,35 @@
       .priceBox{text-align:left}
       .qtyWrap{min-width:0}
     }
+  
+  /* ===== MOBILE CART BAR ===== */
+
+.mobileCartBar{
+  display:none;
+}
+
+@media (max-width:980px){
+  .mobileCartBar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#111827;
+    color:#ffffff;
+    padding:18px;
+    text-align:center;
+    font-weight:800;
+    font-size:16px;
+    z-index:100;
+    cursor:pointer;
+    box-shadow:0 -8px 25px rgba(0,0,0,.35);
+    display:none;
+  }
+
+  body{
+    padding-bottom:80px;
+  }
+}
   </style>
 </head>
 
@@ -1438,6 +1467,18 @@
       updateOrder();
       closeModal();        // ✅ cierra automáticamente
       toast("Agregado al pedido");
+      /* ===== CONTROL BARRA MOBILE ===== */
+const mobileBar = $("mobileCartBar");
+const mobileCount = $("mobileCartCount");
+
+if(mobileBar && mobileCount){
+  if(order.length > 0){
+    mobileCount.textContent = order.length;
+    mobileBar.style.display = "block";
+  }else{
+    mobileBar.style.display = "none";
+  }
+}
     }
 
     // ====== PEDIDO / PANEL DERECHO ======
@@ -1597,6 +1638,21 @@ TOTAL PEDIDO: ${formatMoney(totalGeneral)}
 
     // ====== INIT ======
     loadFromSheet().then(()=> updateOrder());
+
+    
+
+<div class="mobileCartBar" id="mobileCartBar" onclick="scrollToOrder()">
+  🧾 Ver pedido (<span id="mobileCartCount">0</span>)
+
+function scrollToOrder(){
+  const orderPanel = document.querySelector(".right");
+  if(orderPanel){
+    orderPanel.scrollIntoView({behavior:"smooth"});
+  }
+}
+  
+</div>
+    
   </script>
 </body>
 </html>
