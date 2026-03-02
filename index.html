@@ -468,274 +468,126 @@
  * CONFIG
  ********************/
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNkhK7Xcfnr-YpU4Kgp6UqETtbdEOr4EZ7nf0u3fv4eFK4E1c0D_fyb6mJXJTOY7zDSr7rRcpepuTA/pub?output=csv";
-
-// Tu número con código país, sin +, sin espacios:
-const WHATSAPP_PHONE = "5491158390513"; // <-- CAMBIAR
+const WHATSAPP_PHONE = "5491158390513";
 
 /********************
  * STATE
  ********************/
-let rawRows = [];       // filas del CSV (cada una es una variante)
-let products = [];      // productos agrupados (para grilla)
+let rawRows = [];
+let products = [];
 let categories = [];
 let activeCategory = "Todos";
 let filtered = [];
 
-let selectedProduct = null; // producto agrupado abierto en modal
-let selectedRow = null;     // variante exacta elegida en modal
+let selectedProduct = null;
+let selectedRow = null;
+
+let selCal = "";
+let selMed = "";
+let selCol = "";
 
 let carouselImages = [];
 let carouselIndex = 0;
 
+let currentQty = 1;
+let currentStep = 1;
+
 const cart = [];
 
 /********************
- * DOM helpers
+ * HELPERS
  ********************/
-const $ = (id) => document.getElementById(id);
+const $ = (id)=>document.getElementById(id);
+const norm = s => String(s ?? "").trim();
+const normLower = s => norm(s).toLowerCase();
+const splitList = v => norm(v).split(",").map(x=>x.trim()).filter(Boolean);
 
-function escapeHtml(s){
-  return String(s ?? "").replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[m]));
-}
-
-/********************
- * CSV parsing (robusto)
- ********************/
-function parseCSV(text){
-  const rows = [];
-  let row = [];
-  let cur = "";
-  let inQuotes = false;
-
-  for (let i=0; i<text.length; i++){
-    const c = text[i];
-    const n = text[i+1];
-
-    if (c === '"' && inQuotes && n === '"'){ cur += '"'; i++; continue; }
-    if (c === '"'){ inQuotes = !inQuotes; continue; }
-
-    if (!inQuotes && (c === "," || c === "\n" || c === "\r")){
-      if (c === "," ){
-        row.push(cur); cur = "";
-      } else {
-        if (c === "\r" && n === "\n") { /* windows */ }
-        row.push(cur); cur = "";
-        if (row.some(v => String(v ?? "").trim() !== "")) rows.push(row);
-        row = [];
-      }
-      continue;
-    }
-    cur += c;
-  }
-  if (cur.length || row.length){
-    row.push(cur);
-    if (row.some(v => String(v ?? "").trim() !== "")) rows.push(row);
-  }
-  return rows;
-}
-
-function norm(s){ return String(s ?? "").trim(); }
-function normLower(s){ return norm(s).toLowerCase(); }
-function splitList(v){
-  return norm(v).split(",").map(x=>x.trim()).filter(Boolean);
-}
-
-/********************
- * imágenes / urls
- ********************/
-function buildUrl(v){
-  const s = norm(v);
-  if(!s) return "";
-  if(/^https?:\/\//i.test(s)) return s;     // ya es URL absoluta
-  return s.replace(/^\.?\//, "");          // deja "img/..." tal cual
-}
-
-function parseImagesField(imagenes){
-  // admite urls separadas por coma
-  return splitList(imagenes).map(buildUrl);
-}
-
-function parseImageMapField(imagenes_por_color){
-  const s = norm(imagenes_por_color);
-  if(!s) return null;
-
-  // 1) intentar JSON
-  try{
-    const obj = JSON.parse(s);
-    // valores pueden ser url o lista separada por coma
-    const out = {};
-    for(const k in obj){
-      out[k] = parseImagesField(String(obj[k]));
-    }
-    return out;
-  }catch(_){}
-
-  // 2) formato pipe: "azul=url|negro=url"
-  const out = {};
-  const parts = s.split("|").map(x=>x.trim()).filter(Boolean);
-  for(const p of parts){
-    const idx = p.indexOf("=");
-    if(idx === -1) continue;
-    const key = p.slice(0, idx).trim();
-    const val = p.slice(idx+1).trim();
-    out[key] = parseImagesField(val);
-  }
-  return out;
-}
-
-function isDynamicMode(color_modo){
-  const m = normLower(color_modo);
-  return (m === "swap" || m === "dinamico" || m === "dinámico");
-}
-
-/********************
- * cantidad / reglas
- ********************/
 function parseNum(v){
   const s = norm(v).replace(/\./g,"").replace(",",".");
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
 }
 
-function extractStepFromRule(ruleText){
-  const t = normLower(ruleText);
-  if(!t) return null;
-
-  const m1 = t.match(/(multiplo|múltiplo|multiplos|múltiplos)\s*(de)?\s*(\d+)/i);
-  if(m1 && m1[3]) return Number(m1[3]);
-
-  const m2 = t.match(/(de a|por)\s*(\d+)/i);
-  if(m2 && m2[2]) return Number(m2[2]);
-
-  return null;
-}
-
-function validateQty(row, qty){
-  const min = parseNum(row.minimo) ?? 1;
-  if(qty < min) return {ok:false, msg:`Mínimo ${min} ${row.unidad || ""}`};
-
-  const step = extractStepFromRule(row.regla_cantidad);
-  if(step && (qty % step !== 0)){
-    return {ok:false, msg:`Debe ser múltiplo de ${step}`};
-  }
-  return {ok:true, msg:""};
+function extractStep(rule){
+  const t = normLower(rule);
+  const m = t.match(/(multiplo|múltiplo|de a|por)\s*(de)?\s*(\d+)/i);
+  return m ? Number(m[3]) : 1;
 }
 
 /********************
- * LOAD + GROUP
+ * LOAD CSV
  ********************/
 async function loadSheet(){
-  setStatus("Cargando planilla...");
   const res = await fetch(SHEET_CSV_URL, {cache:"no-store"});
-  if(!res.ok) throw new Error("No pude leer el CSV. Revisá el link publicado.");
   const text = await res.text();
-  const rows = parseCSV(text);
-  if(rows.length < 2) throw new Error("CSV vacío.");
+  const rows = text.split("\n").map(r=>r.split(","));
+  const header = rows[0].map(h=>normLower(h));
 
-  const header = rows[0].map(h => normLower(h));
-  const idx = (name) => header.indexOf(normLower(name));
+  const idx = name => header.indexOf(normLower(name));
 
-  // mapear a objetos por fila
-  const data = rows.slice(1).map(r=>{
-    const get = (k) => {
-      const i = idx(k);
-      return i === -1 ? "" : (r[i] ?? "");
-    };
-    return {
-      categoria: norm(get("categoria")),
-      producto: norm(get("producto")),
-      descripcion_producto: norm(get("descripcion_producto")),
-      calidad: norm(get("calidad")),
-      codigo_base: norm(get("codigo_base")),
-      medida_cm: norm(get("medida_cm")),
-      color: norm(get("color")),
-      codigo_color: norm(get("codigo_color")),
-      precio_unitario: parseNum(get("precio_unitario")),
-      stock_disponible: parseNum(get("stock_disponible")),
-      unidad: norm(get("unidad")) || "u",
-      minimo: get("minimo"),
-      regla_cantidad: norm(get("regla_cantidad")),
-      es_plastico: norm(get("es_plastico")),
-      carta_colores: norm(get("carta_colores")),
-      imagenes: norm(get("imagenes")),
-      color_modo: norm(get("color_modo")),
-      imagenes_por_color: norm(get("imagenes_por_color"))
-    };
-  }).filter(r => r.categoria && r.producto);
+  rawRows = rows.slice(1).map(r=>({
+    categoria: r[idx("categoria")],
+    producto: r[idx("producto")],
+    descripcion: r[idx("descripcion_producto")],
+    calidad: r[idx("calidad")],
+    codigo_base: r[idx("codigo_base")],
+    medida_cm: r[idx("medida_cm")],
+    color: r[idx("color")],
+    precio_unitario: parseNum(r[idx("precio_unitario")]),
+    stock: parseNum(r[idx("stock_disponible")]),
+    unidad: r[idx("unidad")] || "u",
+    minimo: parseNum(r[idx("minimo")]) || 1,
+    regla: r[idx("regla_cantidad")],
+    imagenes: r[idx("imagenes")]
+  })).filter(r=>r.producto);
 
-  rawRows = data;
-  setStatus("");
-
-  // agrupar productos
-  const map = new Map(); // key -> product
-  for(const r of rawRows){
-    const key = `${r.categoria}||${r.producto}||${r.codigo_base}`;
-    if(!map.has(key)){
-      map.set(key, {
-        key,
-        categoria: r.categoria,
-        producto: r.producto,
-        descripcion: r.descripcion_producto,
-        codigo_base: r.codigo_base,
-        carta_colores: r.carta_colores,
-        imagenes: r.imagenes,
-        color_modo: r.color_modo,
-        imagenes_por_color: r.imagenes_por_color,
-        qualities: new Set(),
-        sizes: new Set(),
-        colors: new Set(),
-        rows: []
-      });
-    }
-    const p = map.get(key);
-    if(r.calidad) p.qualities.add(r.calidad);
-    if(r.medida_cm) p.sizes.add(r.medida_cm);
-    if(r.color) p.colors.add(r.color);
-
-    // preferir datos si faltan
-    if(!p.carta_colores && r.carta_colores) p.carta_colores = r.carta_colores;
-    if(!p.imagenes && r.imagenes) p.imagenes = r.imagenes;
-
-    // si alguno es dinámico, mantenerlo
-    if(isDynamicMode(r.color_modo)) p.color_modo = "dinamico";
-    if(!p.imagenes_por_color && r.imagenes_por_color) p.imagenes_por_color = r.imagenes_por_color;
-
-    p.rows.push(r);
-  }
-
-  products = Array.from(map.values()).map(p=>({
-    ...p,
-    qualities: Array.from(p.qualities),
-    sizes: Array.from(p.sizes),
-    colors: Array.from(p.colors)
-  }));
-
-  categories = Array.from(new Set(["Todos", ...products.map(p=>p.categoria)]));
-  activeCategory = "Todos";
-
+  groupProducts();
   renderCategories();
   applyFilters();
 }
 
-function setStatus(msg){ $("status").textContent = msg || ""; }
+function groupProducts(){
+  const map = new Map();
+
+  rawRows.forEach(r=>{
+    const key = r.categoria + r.producto + r.codigo_base;
+    if(!map.has(key)){
+      map.set(key,{
+        ...r,
+        rows:[],
+        qualities:new Set(),
+        sizes:new Set(),
+        colors:new Set()
+      });
+    }
+    const p = map.get(key);
+    p.rows.push(r);
+    if(r.calidad) p.qualities.add(r.calidad);
+    if(r.medida_cm) p.sizes.add(r.medida_cm);
+    if(r.color) p.colors.add(r.color);
+  });
+
+  products = Array.from(map.values()).map(p=>({
+    ...p,
+    qualities:[...p.qualities],
+    sizes:[...p.sizes],
+    colors:[...p.colors]
+  }));
+
+  categories = ["Todos", ...new Set(products.map(p=>p.categoria))];
+}
 
 /********************
- * UI: categorías + lista
+ * UI LIST
  ********************/
 function renderCategories(){
   const bar = $("catbar");
-  bar.innerHTML = "";
-  categories.forEach(cat=>{
-    const b = document.createElement("button");
-    b.className = "chip" + (cat === activeCategory ? " active" : "");
-    b.textContent = cat;
-    b.onclick = ()=>{
-      activeCategory = cat;
-      renderCategories();
-      applyFilters();
-    };
+  bar.innerHTML="";
+  categories.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="chip"+(c===activeCategory?" active":"");
+    b.textContent=c;
+    b.onclick=()=>{activeCategory=c;renderCategories();applyFilters();};
     bar.appendChild(b);
   });
 }
@@ -743,473 +595,115 @@ function renderCategories(){
 function applyFilters(){
   const q = normLower($("search").value);
   filtered = products.filter(p=>{
-    const matchCat = (activeCategory === "Todos") || (p.categoria === activeCategory);
-    const hay = `${p.producto} ${p.codigo_base} ${p.descripcion} ${p.categoria}`.toLowerCase();
-    const matchQ = !q || hay.includes(q);
-    return matchCat && matchQ;
+    const cat = activeCategory==="Todos" || p.categoria===activeCategory;
+    const txt = (p.producto+p.descripcion+p.codigo_base).toLowerCase();
+    return cat && (!q || txt.includes(q));
   });
-  $("count").textContent = `${filtered.length} ítems`;
   renderList();
 }
 
 function renderList(){
-  const list = $("list");
-  list.innerHTML = "";
-
+  const list=$("list");
+  list.innerHTML="";
   filtered.forEach(p=>{
-    const card = document.createElement("div");
-    card.className = "card";
-    card.onclick = ()=> openProductModal(p);
+    const c=document.createElement("div");
+    c.className="card";
+    c.onclick=()=>openProductModal(p);
 
-    const imgWrap = document.createElement("div");
-    imgWrap.className = "img";
-
-    const img = document.createElement("img");
-    const baseImgs = parseImagesField(p.imagenes);
-    img.src = baseImgs[0] || "";
-    img.alt = p.producto;
-
-    imgWrap.appendChild(img);
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.innerHTML = `
-      <div class="title">${escapeHtml(p.producto)}</div>
-      <div class="code">${escapeHtml(p.codigo_base || "")}</div>
+    c.innerHTML=`
+      <div class="img"><img src="${p.imagenes}" /></div>
+      <div class="meta">
+        <div class="title">${p.producto}</div>
+        <div class="code">${p.codigo_base||""}</div>
+      </div>
     `;
-
-    card.appendChild(imgWrap);
-    card.appendChild(meta);
-    list.appendChild(card);
+    list.appendChild(c);
   });
 }
 
 /********************
- * Modal producto (cartel)
+ * MODAL
  ********************/
 function openProductModal(p){
-  selectedProduct = p;
+  selectedProduct=p;
+  selCal=p.qualities[0]||"";
+  selMed=p.sizes[0]||"";
+  selCol=p.colors[0]||"";
 
-  $("mTitle").textContent = p.producto;
-  $("mSub").textContent = [p.categoria, p.codigo_base].filter(Boolean).join(" · ");
+  $("mTitle").textContent=p.producto;
+  $("pName").textContent=p.producto;
+  $("pDesc").textContent=p.descripcion||"";
 
-  $("pName").textContent = p.producto;
-  $("pDesc").textContent = p.descripcion || "";
+  renderOptions("optCalidad",p.qualities,v=>{selCal=v;updateVariant();});
+  renderOptions("optMedida",p.sizes,v=>{selMed=v;updateVariant();});
+  renderOptions("optColor",p.colors,v=>{selCol=v;updateVariant();});
 
-  // carta colores
-  if(p.carta_colores){
-    $("btnColorChart").style.display = "inline-flex";
-    $("btnColorChart").onclick = ()=> window.open(buildUrl(p.carta_colores), "_blank");
-  }else{
-    $("btnColorChart").style.display = "none";
-    $("btnColorChart").onclick = null;
-  }
-
-  // llenar selects
-  let selCal = p.qualities[0] || "";
-let selMed = p.sizes[0] || "";
-let selCol = p.colors[0] || "";
-
-renderOptionButtons("optCalidad", p.qualities, selCal, (v)=>{
-  selCal = v;
   updateVariant();
+
   $("productModal").classList.add("open");
-$("productModal").setAttribute("aria-hidden","false");
-});
+  $("productModal").setAttribute("aria-hidden","false");
+}
 
-renderOptionButtons("optMedida", p.sizes, selMed, (v)=>{
-  selMed = v;
-  updateVariant();
-});
-
-renderOptionButtons("optColor", p.colors, selCol, (v)=>{
-  selCol = v;
-  updateVariant();
-});
+function renderOptions(id,values,onChange){
+  const wrap=$(id);
+  wrap.innerHTML="";
+  values.forEach(v=>{
+    const b=document.createElement("div");
+    b.className="optionBtn";
+    b.textContent=v;
+    b.onclick=()=>{onChange(v);};
+    wrap.appendChild(b);
+  });
+}
 
 function updateVariant(){
-  selectedRow = findBestRow(p, selCal, selMed, selCol);
+  selectedRow=selectedProduct.rows.find(r=>
+    r.calidad===selCal &&
+    r.medida_cm===selMed &&
+    r.color===selCol
+  )||selectedProduct.rows[0];
+
   updateVariantUI();
 }
 
-  // init
 function updateVariantUI(){
-
   if(!selectedRow) return;
 
-  const unit = selectedRow?.unidad || "u";
-  const min = parseNum(selectedRow?.minimo) ?? 1;
-  const rule = selectedRow?.regla_cantidad || "";
-  const price = selectedRow?.precio_unitario;
-  const stock = selectedRow?.stock_disponible;
+  currentStep=extractStep(selectedRow.regla)||1;
+  currentQty=selectedRow.minimo||1;
 
-  // ===== Precio =====
-  $("priceText").textContent =
-    (price && price > 0)
-      ? `$${price.toLocaleString("es-AR")}`
-      : "Consultar";
+  $("qty").value=currentQty;
 
-  // ===== Stock =====
-  $("stockText").textContent =
-    (stock === null || stock === undefined)
-      ? ""
-      : `Stock: ${stock}`;
-
-  // ===== Reglas =====
-  const parts = [];
-  if(min > 1) parts.push(`Mínimo: ${min} ${unit}`);
-  if(rule) parts.push(rule);
-  $("ruleText").textContent = parts.join(" · ");
-
-  // ===== Cantidad inteligente =====
-  const step = extractStepFromRule(selectedRow?.regla_cantidad) || 1;
-
-  let currentQty = min;
-  $("qty").value = currentQty;
-
-  $("qtyPlus").onclick = ()=>{
-    currentQty += step;
-    $("qty").value = currentQty;
+  $("qtyPlus").onclick=()=>{
+    currentQty+=currentStep;
+    $("qty").value=currentQty;
   };
-
-  $("qtyMinus").onclick = ()=>{
-    if(currentQty - step >= min){
-      currentQty -= step;
-      $("qty").value = currentQty;
+  $("qtyMinus").onclick=()=>{
+    if(currentQty-currentStep>=selectedRow.minimo){
+      currentQty-=currentStep;
+      $("qty").value=currentQty;
     }
   };
 
-  // ===== Imágenes =====
-  carouselImages = getImagesForModal(selectedProduct, selectedRow.color);
-  carouselIndex = 0;
-  renderCarousel();
+  $("priceText").textContent=selectedRow.precio_unitario?
+    "$"+selectedRow.precio_unitario:
+    "Consultar";
+
+  $("stockText").textContent=selectedRow.stock?
+    "Stock: "+selectedRow.stock:
+    "";
+
+  $("ruleText").textContent=selectedRow.regla||"";
 }
 
-function closeProductModal(){
+$("closeProduct").onclick=()=>{
   $("productModal").classList.remove("open");
-  $("productModal").setAttribute("aria-hidden","true");
-  selectedProduct = null;
-  selectedRow = null;
-}
-
-function renderOptionButtons(containerId, values, selectedValue, onChange){
-  const wrap = document.getElementById(containerId);
-  wrap.innerHTML = "";
-
-  if(!values || !values.length){
-    wrap.innerHTML = "<div class='muted'>—</div>";
-    return;
-  }
-
-  values.forEach(val=>{
-    const btn = document.createElement("div");
-    btn.className = "optionBtn" + (val === selectedValue ? " active" : "");
-    btn.textContent = val;
-
-    btn.onclick = ()=>{
-      renderOptionButtons(containerId, values, val, onChange);
-      onChange(val);
-    };
-
-    wrap.appendChild(btn);
-  });
-}
-
-// elegir mejor fila (variante)
-function findBestRow(p, calidad, medida, color){
-  let best = null, bestScore = -999;
-
-  for(const r of p.rows){
-    let s = 0;
-
-    if(calidad && r.calidad === calidad) s += 4;
-    if(medida && r.medida_cm === medida) s += 3;
-    if(color && r.color === color) s += 5;
-
-    if(calidad && r.calidad && r.calidad !== calidad) s -= 10;
-    if(medida && r.medida_cm && r.medida_cm !== medida) s -= 8;
-    if(color && r.color && r.color !== color) s -= 12;
-
-    if((r.precio_unitario ?? 0) > 0) s += 1;
-
-    if(s > bestScore){
-      bestScore = s;
-      best = r;
-    }
-  }
-  return best;
-}
-
-// armar imágenes según modo y color
-function getImagesForModal(p, selectedColor){
-  const dynamic = isDynamicMode(p.color_modo);
-  if(dynamic){
-    const map = parseImageMapField(p.imagenes_por_color);
-    if(map){
-      // key exacto
-      if(map[selectedColor] && map[selectedColor].length) return map[selectedColor];
-      // key case-insensitive fallback
-      const k = Object.keys(map).find(x=> x.toLowerCase() === String(selectedColor).toLowerCase());
-      if(k && map[k].length) return map[k];
-    }
-  }
-  const base = parseImagesField(p.imagenes);
-  return base.length ? base : [];
-}
-
-function refreshVariantAndImages(){
-  if(!selectedProduct) return;
-
-  const cal = $("selCalidad").value;
-  const med = $("selMedida").value;
-  const col = $("selColor").value;
-
-  selectedRow = findBestRow(selectedProduct, cal, med, col);
-
-  // reglas + precio + stock
-  const unit = selectedRow?.unidad || "u";
-  const min = parseNum(selectedRow?.minimo) ?? 1;
-  const rule = selectedRow?.regla_cantidad || "";
-  const price = selectedRow?.precio_unitario;
-  const stock = selectedRow?.stock_disponible;
-
-  if(Number($("qty").value) < min) $("qty").value = String(min);
-
-  const parts = [];
-  if(min > 1) parts.push(`Mínimo: ${min} ${unit}`);
-  if(rule) parts.push(rule);
-  $("ruleText").textContent = parts.join(" · ");
-
-  $("priceText").textContent = (price && price > 0) ? `$${price.toLocaleString("es-AR")}` : "Consultar";
-  $("stockText").textContent = (stock === null || stock === undefined) ? "" : `Stock: ${stock}`;
-
-  // imágenes + carrusel
-  carouselImages = getImagesForModal(selectedProduct, col);
-  carouselIndex = 0;
-  renderCarousel();
-
-  $("addHint").textContent = "";
-}
-
-function renderCarousel(){
-  const img = $("mainImg");
-  const thumbs = $("thumbs");
-  thumbs.innerHTML = "";
-
-  if(!carouselImages.length){
-    img.removeAttribute("src");
-    img.alt = "Sin imagen";
-    $("prevImg").style.display = "none";
-    $("nextImg").style.display = "none";
-    return;
-  }
-
-  $("prevImg").style.display = carouselImages.length > 1 ? "flex" : "none";
-  $("nextImg").style.display = carouselImages.length > 1 ? "flex" : "none";
-
-  img.src = carouselImages[carouselIndex];
-  img.alt = "Foto del producto";
-
-  carouselImages.forEach((src, i)=>{
-    const t = document.createElement("div");
-    t.className = "thumb" + (i === carouselIndex ? " active" : "");
-    t.onclick = ()=>{ carouselIndex = i; renderCarousel(); };
-
-    const im = document.createElement("img");
-    im.src = src;
-    im.alt = "thumb";
-    t.appendChild(im);
-    thumbs.appendChild(t);
-  });
-}
-
-/********************
- * Carrito + WhatsApp
- ********************/
-function renderCart(){
-  const wrap = $("cart");
-  wrap.innerHTML = "";
-
-  if(!cart.length){
-    wrap.innerHTML = `<div class="muted">Todavía no agregaste ítems.</div>`;
-    return;
-  }
-
-  cart.forEach((it, idx)=>{
-    const div = document.createElement("div");
-    div.className = "cartItem";
-    div.innerHTML = `
-      <div class="left">
-        <div class="name">${escapeHtml(it.producto)}</div>
-        <div class="line">
-          ${it.codigo_base ? `Código: <b>${escapeHtml(it.codigo_base)}</b> · ` : ""}
-          ${it.calidad ? `Calidad: <b>${escapeHtml(it.calidad)}</b> · ` : ""}
-          ${it.medida_cm ? `Medida: <b>${escapeHtml(it.medida_cm)} cm</b> · ` : ""}
-          ${it.color ? `Color: <b>${escapeHtml(it.color)}</b> · ` : ""}
-          Cant: <b>${escapeHtml(it.qty)} ${escapeHtml(it.unidad)}</b>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="miniBtn" data-del="${idx}">Eliminar</button>
-      </div>
-    `;
-    wrap.appendChild(div);
-  });
-
-  wrap.querySelectorAll("[data-del]").forEach(btn=>{
-    btn.onclick = ()=>{
-      const i = Number(btn.getAttribute("data-del"));
-      cart.splice(i,1);
-      renderCart();
-    };
-  });
-}
-
-function clearCart(){
-  cart.length = 0;
-  renderCart();
-}
-
-function addToCartFromModal(){
-  if(!selectedProduct || !selectedRow){
-    $("addHint").textContent = "No se pudo identificar la variante.";
-    return;
-  }
-
-  const qty = Number($("qty").value);
-  if(!Number.isFinite(qty) || qty <= 0){
-    $("addHint").textContent = "Cantidad inválida.";
-    return;
-  }
-
-  const v = validateQty(selectedRow, qty);
-  if(!v.ok){
-    $("addHint").textContent = v.msg;
-    return;
-  }
-
-  // key variante
-  const key = `${selectedProduct.key}||${selectedRow.calidad}||${selectedRow.medida_cm}||${selectedRow.color}`;
-
-  const existing = cart.find(x=>x.key === key);
-  if(existing){
-    existing.qty += qty;
-  }else{
-    cart.push({
-      key,
-      producto: selectedProduct.producto,
-      codigo_base: selectedProduct.codigo_base,
-      calidad: selectedRow.calidad,
-      medida_cm: selectedRow.medida_cm,
-      color: selectedRow.color,
-      qty,
-      unidad: selectedRow.unidad || "u",
-      codigo_color: selectedRow.codigo_color,
-      precio_unitario: selectedRow.precio_unitario
-    });
-  }
-
-  renderCart();
-  $("addHint").textContent = "Agregado al pedido ✅";
-}
-
-function buildWhatsAppText(){
-  const name = norm($("clientName").value);
-  const lines = [];
-  lines.push(`Pedido - Botonera Enri`);
-  lines.push(`Cliente: ${name}`);
-  lines.push("");
-  lines.push("Items:");
-
-  cart.forEach((it, i)=>{
-    const parts = [];
-    if(it.codigo_base) parts.push(it.codigo_base);
-    if(it.color) parts.push(it.color);
-    if(it.medida_cm) parts.push(`${it.medida_cm} cm`);
-    const head = `${i+1}) ${it.producto} — ${parts.join(" | ")}`;
-    const qtyLine = `   Cantidad: ${it.qty} ${it.unidad}`;
-    lines.push(head);
-    lines.push(qtyLine);
-  });
-
-  lines.push("");
-  lines.push("Gracias!");
-  return lines.join("\n");
-}
-
-function sendWhatsApp(){
-  const name = norm($("clientName").value);
-  if(!name){
-    alert("Para enviar por WhatsApp primero poné el nombre del cliente.");
-    return;
-  }
-  if(!cart.length){
-    alert("No hay ítems en el pedido.");
-    return;
-  }
-  const text = buildWhatsAppText();
-  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
-  window.open(url, "_blank");
-}
-
-/********************
- * Lightbox
- ********************/
-function openLightbox(src){
-  $("lightboxImg").src = src;
-  $("lightbox").classList.add("open");
-}
-function closeLightbox(){
-  $("lightbox").classList.remove("open");
-  $("lightboxImg").removeAttribute("src");
-}
-
-/********************
- * Events
- ********************/
-$("search").addEventListener("input", applyFilters);
-$("reload").addEventListener("click", ()=> loadSheet().catch(err=>setStatus(err.message)));
-
-$("clearCart").addEventListener("click", clearCart);
-$("sendWA").addEventListener("click", sendWhatsApp);
-
-$("closeProduct").addEventListener("click", closeProductModal);
-$("productModal").addEventListener("click", (e)=>{
-  if(e.target.id === "productModal") closeProductModal();
-});
-
-$("prevImg").addEventListener("click", ()=>{
-  if(!carouselImages.length) return;
-  carouselIndex = (carouselIndex - 1 + carouselImages.length) % carouselImages.length;
-  renderCarousel();
-});
-$("nextImg").addEventListener("click", ()=>{
-  if(!carouselImages.length) return;
-  carouselIndex = (carouselIndex + 1) % carouselImages.length;
-  renderCarousel();
-});
-
-$("mainImg").addEventListener("click", ()=>{
-  if(!carouselImages.length) return;
-  openLightbox(carouselImages[carouselIndex]);
-});
-
-$("lightbox").addEventListener("click", closeLightbox);
-
-$("addToCart").addEventListener("click", addToCartFromModal);
+};
 
 /********************
  * INIT
  ********************/
-(async function init(){
-  try{
-    await loadSheet();
-    renderCart();
-    $("waHint").textContent = "Abre WhatsApp Web con el texto armado.";
-  }catch(err){
-    setStatus(err.message);
-  }
-})();
+loadSheet();
+$("search").addEventListener("input",applyFilters);
 </script>
-</body>
 </html>
