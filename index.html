@@ -109,26 +109,30 @@
   background:#ffffff;
 }
     
-    .pill{
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      color:var(--text);
-      font-size:13px;
-      cursor:pointer;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      user-select:none;
-      transition: .12s ease;
-    }
-    .pill:hover{transform: translateY(-1px); background: rgba(255,255,255,.06)}
-    .pill.active{
-      border-color: rgba(77,163,255,.55);
-      box-shadow: 0 0 0 4px rgba(77,163,255,.13);
-      background: rgba(77,163,255,.10);
-    }
+   .pill{
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#ffffff;
+  color:var(--text);
+  font-size:13px;
+  cursor:pointer;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  user-select:none;
+  transition: .15s ease;
+}
+
+.pill:hover{
+  background:#f3f4f6;
+}
+
+.pill.active{
+  background: var(--accent);
+  color:#ffffff;
+  border-color: var(--accent);
+}
     .count{
       font-size:11px;
       color:var(--muted);
