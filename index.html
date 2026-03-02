@@ -77,24 +77,43 @@
       overflow:hidden;
     }
 
-    /* ===== Panel derecho destacado ===== */
+/* ===== PANEL DERECHO ESTILO PRO ===== */
 .right .panel{
+  background:#ffffff;
   border:1px solid #d1d5db;
   border-radius:22px;
-  box-shadow: 0 20px 45px rgba(0,0,0,.15);
-  position:relative;
+  box-shadow: 0 22px 50px rgba(0,0,0,.16);
+  overflow:hidden;
 }
 
-/* Franja superior */
-.right .panel::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:6px;
-  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+/* Encabezado del panel derecho */
+.right .top{
+  background:#f3f4f6;
+  border-bottom:1px solid #e5e7eb;
+  padding:18px;
 }
+
+/* Más aire interno */
+.right .orderBox{
+  padding:20px;
+  gap:16px;
+}
+
+/* Total más protagonista */
+.right .orderTotal{
+  font-weight:900;
+  font-size:18px;
+  padding:16px 0;
+  border-top:1px solid #e5e7eb;
+}
+
+/* Más separación entre columnas */
+.layout{
+  display:flex;
+  gap:28px;
+  align-items:flex-start;
+}
+
 
     /* Category bar */
     .catbar{
