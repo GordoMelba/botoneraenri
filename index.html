@@ -412,24 +412,33 @@
 
         <div class="sep"></div>
 
-        <div class="grid2">
-          <div class="field">
-            <div class="label">Calidad</div>
-            <select id="selCalidad"></select>
-          </div>
-          <div class="field">
-            <div class="label">Medida (cm)</div>
-            <select id="selMedida"></select>
-          </div>
-          <div class="field">
-            <div class="label">Color</div>
-            <select id="selColor"></select>
-          </div>
-          <div class="field">
-            <div class="label">Cantidad</div>
-            <input id="qty" type="number" min="1" step="1" />
-          </div>
-        </div>
+      <div class="grid2">
+
+  <div class="field">
+    <div class="label">Calidad</div>
+    <div id="optCalidad" class="optionGroup"></div>
+  </div>
+
+  <div class="field">
+    <div class="label">Medida (cm)</div>
+    <div id="optMedida" class="optionGroup"></div>
+  </div>
+
+  <div class="field">
+    <div class="label">Color</div>
+    <div id="optColor" class="optionGroup"></div>
+  </div>
+
+  <div class="field">
+    <div class="label">Cantidad</div>
+    <div class="qtyControl">
+      <button id="qtyMinus" class="qtyBtn">−</button>
+      <input id="qty" type="number" readonly />
+      <button id="qtyPlus" class="qtyBtn">+</button>
+    </div>
+  </div>
+
+</div>
 
         <div class="note" id="ruleText"></div>
         <div class="sep"></div>
@@ -797,29 +806,83 @@ function openProductModal(p){
   }
 
   // llenar selects
-  fillSelect($("selCalidad"), p.qualities.length ? p.qualities : ["—"]);
-  fillSelect($("selMedida"), p.sizes.length ? p.sizes : ["—"]);
-  fillSelect($("selColor"), p.colors.length ? p.colors : ["—"]);
+  let selCal = p.qualities[0] || "";
+let selMed = p.sizes[0] || "";
+let selCol = p.colors[0] || "";
 
-  // defaults
-  $("selCalidad").value = p.qualities[0] || "—";
-  $("selMedida").value = p.sizes[0] || "—";
-  $("selColor").value = p.colors[0] || "—";
+renderOptionButtons("optCalidad", p.qualities, selCal, (v)=>{
+  selCal = v;
+  updateVariant();
+  $("productModal").classList.add("open");
+$("productModal").setAttribute("aria-hidden","false");
+});
 
-  // set qty default
-  $("qty").value = "1";
+renderOptionButtons("optMedida", p.sizes, selMed, (v)=>{
+  selMed = v;
+  updateVariant();
+});
 
-  // bind changes
-  $("selCalidad").onchange = refreshVariantAndImages;
-  $("selMedida").onchange = refreshVariantAndImages;
-  $("selColor").onchange = refreshVariantAndImages;
+renderOptionButtons("optColor", p.colors, selCol, (v)=>{
+  selCol = v;
+  updateVariant();
+});
+
+function updateVariant(){
+  selectedRow = findBestRow(p, selCal, selMed, selCol);
+  updateVariantUI();
+}
 
   // init
-  refreshVariantAndImages();
+function updateVariantUI(){
 
-  // open modal
-  $("productModal").classList.add("open");
-  $("productModal").setAttribute("aria-hidden","false");
+  if(!selectedRow) return;
+
+  const unit = selectedRow?.unidad || "u";
+  const min = parseNum(selectedRow?.minimo) ?? 1;
+  const rule = selectedRow?.regla_cantidad || "";
+  const price = selectedRow?.precio_unitario;
+  const stock = selectedRow?.stock_disponible;
+
+  // ===== Precio =====
+  $("priceText").textContent =
+    (price && price > 0)
+      ? `$${price.toLocaleString("es-AR")}`
+      : "Consultar";
+
+  // ===== Stock =====
+  $("stockText").textContent =
+    (stock === null || stock === undefined)
+      ? ""
+      : `Stock: ${stock}`;
+
+  // ===== Reglas =====
+  const parts = [];
+  if(min > 1) parts.push(`Mínimo: ${min} ${unit}`);
+  if(rule) parts.push(rule);
+  $("ruleText").textContent = parts.join(" · ");
+
+  // ===== Cantidad inteligente =====
+  const step = extractStepFromRule(selectedRow?.regla_cantidad) || 1;
+
+  let currentQty = min;
+  $("qty").value = currentQty;
+
+  $("qtyPlus").onclick = ()=>{
+    currentQty += step;
+    $("qty").value = currentQty;
+  };
+
+  $("qtyMinus").onclick = ()=>{
+    if(currentQty - step >= min){
+      currentQty -= step;
+      $("qty").value = currentQty;
+    }
+  };
+
+  // ===== Imágenes =====
+  carouselImages = getImagesForModal(selectedProduct, selectedRow.color);
+  carouselIndex = 0;
+  renderCarousel();
 }
 
 function closeProductModal(){
@@ -829,13 +892,26 @@ function closeProductModal(){
   selectedRow = null;
 }
 
-function fillSelect(sel, arr){
-  sel.innerHTML = "";
-  arr.forEach(v=>{
-    const opt = document.createElement("option");
-    opt.value = v;
-    opt.textContent = v;
-    sel.appendChild(opt);
+function renderOptionButtons(containerId, values, selectedValue, onChange){
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = "";
+
+  if(!values || !values.length){
+    wrap.innerHTML = "<div class='muted'>—</div>";
+    return;
+  }
+
+  values.forEach(val=>{
+    const btn = document.createElement("div");
+    btn.className = "optionBtn" + (val === selectedValue ? " active" : "");
+    btn.textContent = val;
+
+    btn.onclick = ()=>{
+      renderOptionButtons(containerId, values, val, onChange);
+      onChange(val);
+    };
+
+    wrap.appendChild(btn);
   });
 }
 
