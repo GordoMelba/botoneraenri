@@ -1123,33 +1123,53 @@ function updateVariant(){
  ********************/
 function buildQtyOptions(row){
   const min = parseNum(row.minimo) ?? 1;
-
-  // paso desde la regla
-  const step = extractStepFromRule(row.regla_cantidad || row.reglas_cantidad) || 1;
-
   const stock = row.stock_disponible;
+  const rule = norm(row.regla_cantidad || row.reglas_cantidad);
 
-  // si no hay stock o stock <= 0 => sin opciones
-  if(Number.isFinite(stock) && stock !== null){
-    if(stock <= 0) return [];
+  // Si no hay regla → comportamiento simple
+  if(!rule){
+    const step = 1;
+    const out = [];
+    const max = (Number.isFinite(stock) && stock !== null) ? stock : null;
+    let count = 0;
+    for(let q = min; ; q += step){
+      if(max !== null && q > max) break;
+      out.push(q);
+      count++;
+      if(max === null && count >= 200) break;
+    }
+    return out;
   }
+
+  // Parsear regla por tramos
+  // Ej: 50-1000:50|1100-5000:100
+  const segments = rule.split("|").map(s => s.trim()).filter(Boolean);
 
   const out = [];
-  const max = (Number.isFinite(stock) && stock !== null) ? stock : null;
 
-  // límite de seguridad cuando no hay stock
-  const hardMaxCount = 200;
-  let count = 0;
+  segments.forEach(seg=>{
+    const match = seg.match(/^(\d+)-(\d+):(\d+)$/);
+    if(!match) return;
 
-  // arrancamos en min y vamos en step
-  for(let q = min; ; q += step){
-    if(max !== null && q > max) break;
-    out.push(q);
-    count++;
-    if(max === null && count >= hardMaxCount) break;
-  }
+    const from = Number(match[1]);
+    const to   = Number(match[2]);
+    const step = Number(match[3]);
 
-  return out;
+    let realFrom = Math.max(from, min);
+    let realTo = to;
+
+    if(Number.isFinite(stock) && stock !== null){
+      realTo = Math.min(to, stock);
+    }
+
+    for(let q = realFrom; q <= realTo; q += step){
+      if(q >= min){
+        out.push(q);
+      }
+    }
+  });
+
+  return out.sort((a,b)=>a-b);
 }
 
 function setQty(q){
