@@ -200,6 +200,26 @@
       cursor:pointer;
     }
 
+    /* NUEVO: resumen códigos */
+    .summaryBox{
+      border:1px dashed var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      background:#f9fafb;
+      font-size:12px;
+      color:#374151;
+      white-space:pre-line;
+    }
+
+    /* NUEVO: botones extra en pedido */
+    .btnRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+    }
+
     /* MODAL (cartel producto) */
     .modal{
       position:fixed; inset:0;
@@ -234,7 +254,12 @@
       background:#f9fafb;
     }
     @media (max-width: 900px){
-      .box .mbd{grid-template-columns:1fr}
+      .box{ max-height:92vh; }
+      .box .mbd{
+        grid-template-columns:1fr;
+        max-height:calc(92vh - 58px);
+        overflow:auto; /* NUEVO: scroll en móvil si es grande */
+      }
     }
 
     .carousel{
@@ -398,6 +423,26 @@
       background:#fff;
       border:1px solid rgba(255,255,255,.18);
     }
+
+    /* NUEVO: barra mobile VER PEDIDO */
+    .mobileBar{
+      display:none;
+    }
+    @media (max-width: 768px){
+      .mobileBar{
+        display:block;
+        position:fixed;
+        left:0; right:0; bottom:0;
+        background:var(--accent);
+        color:#fff;
+        text-align:center;
+        padding:14px 12px;
+        font-weight:800;
+        z-index:999;
+        cursor:pointer;
+      }
+      main{ padding-bottom:64px; } /* deja lugar para la barra */
+    }
   </style>
 </head>
 
@@ -437,12 +482,9 @@
     </section>
 
     <!-- RIGHT: pedido -->
-    <section class="panel">
+    <section class="panel" id="pedidoPanel">
       <div class="hd">
         <h2>Pedido</h2>
-        <div class="row">
-          <button class="btn danger" id="clearCart">Vaciar</button>
-        </div>
       </div>
       <div class="bd">
         <div class="muted" style="font-size:12px;">Nombre del cliente (obligatorio para enviar)</div>
@@ -455,14 +497,29 @@
 
         <div class="sep"></div>
 
-        <div class="row" style="justify-content:space-between;">
+        <div class="row" style="justify-content:space-between; gap:10px;">
           <button class="btn primary" id="sendWA">Enviar por WhatsApp</button>
           <span class="muted" id="waHint"></span>
         </div>
+
+        <!-- NUEVO: botones extra -->
+        <div class="sep"></div>
+        <div class="btnRow">
+          <button class="btn danger" id="clearCart">Limpiar carrito</button>
+          <button class="btn" id="copyText">Copiar texto</button>
+        </div>
+
+        <!-- NUEVO: resumen códigos -->
+        <div class="sep"></div>
+        <div class="muted" style="font-size:12px; margin-bottom:8px;">Resumen de pedido (en códigos)</div>
+        <div id="summaryCodes" class="summaryBox"></div>
       </div>
     </section>
   </div>
 </main>
+
+<!-- NUEVO: barra mobile -->
+<div class="mobileBar" id="verPedidoBtn">VER PEDIDO</div>
 
 <!-- Modal producto -->
 <div class="modal" id="productModal" aria-hidden="true">
@@ -630,7 +687,13 @@ function buildUrl(v){
   const s = norm(v);
   if(!s) return "";
   if(/^https?:\/\//i.test(s)) return s;
-  return s.replace(/^\.?\//, "");
+  // encodea espacios y caracteres raros sin romper slashes
+  const cleaned = s.replace(/^\.?\//, "");
+  try{
+    return encodeURI(cleaned);
+  }catch(_){
+    return cleaned;
+  }
 }
 function parseImagesField(imagenes){
   return splitList(imagenes).map(buildUrl).filter(Boolean);
@@ -672,6 +735,8 @@ function parseNum(v){
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
 }
+
+/* lee el paso desde regla_cantidad o reglas_cantidad */
 function extractStepFromRule(ruleText){
   const t = normLower(ruleText);
   if(!t) return null;
@@ -684,13 +749,18 @@ function extractStepFromRule(ruleText){
   const m2 = t.match(/(de a|por)\s*(\d+)/i);
   if(m2 && m2[2]) return Number(m2[2]);
 
+  // "50 en 50" / "100 en 100"
+  const m3 = t.match(/(\d+)\s*en\s*(\d+)/i);
+  if(m3 && m3[2]) return Number(m3[2]);
+
   return null;
 }
+
 function validateQty(row, qty){
   const min = parseNum(row.minimo) ?? 1;
   if(qty < min) return {ok:false, msg:`Mínimo ${min} ${row.unidad || ""}`};
 
-  const step = extractStepFromRule(row.regla_cantidad);
+  const step = extractStepFromRule(row.regla_cantidad || row.reglas_cantidad);
   if(step && (qty % step !== 0)){
     return {ok:false, msg:`Debe ser múltiplo de ${step}`};
   }
@@ -722,6 +792,11 @@ async function loadSheet(){
       const i = idx(k);
       return i === -1 ? "" : (r[i] ?? "");
     };
+
+    // IMPORTANTE: soporta ambas columnas: regla_cantidad / reglas_cantidad
+    const reglaA = norm(get("regla_cantidad"));
+    const reglaB = norm(get("reglas_cantidad"));
+
     return {
       categoria: norm(get("categoria")),
       producto: norm(get("producto")),
@@ -735,7 +810,8 @@ async function loadSheet(){
       stock_disponible: parseNum(get("stock_disponible")),
       unidad: norm(get("unidad")) || "u",
       minimo: get("minimo"),
-      regla_cantidad: norm(get("regla_cantidad")),
+      regla_cantidad: reglaA || reglaB,     // usa la que exista
+      reglas_cantidad: reglaB || reglaA,    // por si la querés inspeccionar
       es_plastico: norm(get("es_plastico")),
       carta_colores: norm(get("carta_colores")),
       imagenes: norm(get("imagenes")),
@@ -946,7 +1022,6 @@ function renderOptionButtons(containerId, values, selectedValue, onChange){
     btn.textContent = val;
     btn.onclick = ()=>{
       onChange(val);
-      // re-render para marcar active (simple)
       renderOptionButtons(containerId, values, val, onChange);
     };
     wrap.appendChild(btn);
@@ -978,7 +1053,9 @@ function getImagesForModal(p, selectedColor){
   if(dynamic){
     const map = parseImageMapField(p.imagenes_por_color);
     if(map){
+      // match exacto
       if(map[selectedColor] && map[selectedColor].length) return map[selectedColor];
+      // match case-insensitive
       const k = Object.keys(map).find(x=> x.toLowerCase() === String(selectedColor).toLowerCase());
       if(k && map[k].length) return map[k];
     }
@@ -1042,11 +1119,14 @@ function updateVariant(){
 }
 
 /********************
- * Cantidad dropdown
+ * Cantidad dropdown (RESPETA regla_cantidad / reglas_cantidad)
  ********************/
 function buildQtyOptions(row){
   const min = parseNum(row.minimo) ?? 1;
-  const step = extractStepFromRule(row.regla_cantidad) || 1;
+
+  // paso desde la regla
+  const step = extractStepFromRule(row.regla_cantidad || row.reglas_cantidad) || 1;
+
   const stock = row.stock_disponible;
 
   // si no hay stock o stock <= 0 => sin opciones
@@ -1061,6 +1141,7 @@ function buildQtyOptions(row){
   const hardMaxCount = 200;
   let count = 0;
 
+  // arrancamos en min y vamos en step
   for(let q = min; ; q += step){
     if(max !== null && q > max) break;
     out.push(q);
@@ -1081,7 +1162,6 @@ function renderQtyMenu(options){
   menu.innerHTML = "";
 
   if(!options.length){
-    // sin stock / sin opciones
     const div = document.createElement("div");
     div.className = "qtyItem";
     div.style.cursor = "default";
@@ -1098,7 +1178,6 @@ function renderQtyMenu(options){
     it.onclick = ()=>{
       setQty(v);
       closeQtyMenu();
-      // re-marcar activos
       renderQtyMenu(options);
     };
     menu.appendChild(it);
@@ -1160,7 +1239,35 @@ function renderCarousel(){
 }
 
 /********************
- * Carrito + WhatsApp
+ * Resumen en códigos: ai.06.apto x 500
+ ********************/
+function pad2(n){
+  const x = Number(n);
+  if(!Number.isFinite(x)) return "00";
+  return String(Math.trunc(x)).padStart(2, "0");
+}
+function normalizeCodeBase(c){
+  return normLower(c);
+}
+function normalizeColor(c){
+  return normLower(c).replace(/\s+/g, "_");
+}
+function buildSummaryLine(it){
+  const code = normalizeCodeBase(it.codigo_base || "");
+  const medida = pad2(it.medida_cm);
+  const color = normalizeColor(it.color || "");
+  const qty = it.qty;
+  if(!code) return "";
+  // Formato: ai.06.apto x 500
+  return `${code}.${medida}.${color} x ${qty}`;
+}
+function updateSummaryBox(){
+  const lines = cart.map(buildSummaryLine).filter(Boolean);
+  $("summaryCodes").textContent = lines.length ? lines.join("\n") : "—";
+}
+
+/********************
+ * Carrito + WhatsApp + Copiar
  ********************/
 function renderCart(){
   const wrap = $("cart");
@@ -1168,6 +1275,7 @@ function renderCart(){
 
   if(!cart.length){
     wrap.innerHTML = `<div class="muted">Todavía no agregaste ítems.</div>`;
+    updateSummaryBox();
     return;
   }
 
@@ -1199,6 +1307,8 @@ function renderCart(){
       renderCart();
     };
   });
+
+  updateSummaryBox();
 }
 
 function clearCart(){
@@ -1244,14 +1354,22 @@ function addToCartFromModal(){
   }
 
   renderCart();
-  $("addHint").textContent = "Agregado al pedido ✅";
+
+  // NUEVO: NO mostrar "Agregado al pedido", cerrar modal directamente
+  closeProductModal();
 }
 
-function buildWhatsAppText(){
+function buildWhatsAppText(includeNameStrict){
   const name = norm($("clientName").value);
+
+  if(includeNameStrict && !name){
+    // el caller (sendWhatsApp) ya lo valida, pero por si acaso
+    return null;
+  }
+
   const lines = [];
   lines.push(`Pedido - Botonera Enri`);
-  lines.push(`Cliente: ${name}`);
+  lines.push(`Cliente: ${name || "(sin nombre)"}`);
   lines.push("");
   lines.push("Items:");
 
@@ -1265,6 +1383,16 @@ function buildWhatsAppText(){
     lines.push(head);
     lines.push(qtyLine);
   });
+
+  // NUEVO: resumen en códigos al final
+  lines.push("");
+  lines.push("Resumen (códigos):");
+  const summaryLines = cart.map(buildSummaryLine).filter(Boolean);
+  if(summaryLines.length){
+    summaryLines.forEach(l=>lines.push(l));
+  }else{
+    lines.push("—");
+  }
 
   lines.push("");
   lines.push("Gracias!");
@@ -1281,9 +1409,30 @@ function sendWhatsApp(){
     alert("No hay ítems en el pedido.");
     return;
   }
-  const text = buildWhatsAppText();
+  const text = buildWhatsAppText(true);
   const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
   window.open(url, "_blank");
+}
+
+async function copyOrderText(){
+  if(!cart.length){
+    alert("No hay ítems para copiar.");
+    return;
+  }
+  const text = buildWhatsAppText(false);
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("Texto copiado ✅");
+  }catch(e){
+    // fallback viejo
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("Texto copiado ✅");
+  }
 }
 
 /********************
@@ -1299,6 +1448,15 @@ function closeLightbox(){
 }
 
 /********************
+ * Mobile: VER PEDIDO (scroll al panel derecho)
+ ********************/
+function scrollToPedido(){
+  const el = $("pedidoPanel");
+  if(!el) return;
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/********************
  * Events
  ********************/
 $("search").addEventListener("input", applyFilters);
@@ -1306,6 +1464,9 @@ $("reload").addEventListener("click", ()=> loadSheet().catch(err=>setStatus(err.
 
 $("clearCart").addEventListener("click", clearCart);
 $("sendWA").addEventListener("click", sendWhatsApp);
+$("copyText").addEventListener("click", copyOrderText);
+
+$("verPedidoBtn").addEventListener("click", scrollToPedido);
 
 $("closeProduct").addEventListener("click", closeProductModal);
 $("productModal").addEventListener("click", (e)=>{
@@ -1345,8 +1506,7 @@ $("qtyBox").addEventListener("keydown", (e)=>{
     closeQtyMenu();
   }
 });
-document.addEventListener("click", (e)=>{
-  // click afuera
+document.addEventListener("click", ()=>{
   if($("qtyMenu").classList.contains("open")) closeQtyMenu();
 });
 
