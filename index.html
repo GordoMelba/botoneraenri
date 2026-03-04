@@ -416,13 +416,19 @@
       padding:18px;
     }
     .lightbox.open{display:flex}
+
     .lightbox img{
-      width:min(1100px, 100%);
-      height:auto;
-      border-radius:16px;
-      background:#fff;
-      border:1px solid rgba(255,255,255,.18);
-    }
+  width:auto;
+  max-width:90vw;
+  max-height:80vh;
+  height:auto;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.18);
+  object-fit:contain;
+  cursor:zoom-in;
+  transition: transform .2s ease;
+}
 
     /* NUEVO: barra mobile VER PEDIDO */
     .mobileBar{
@@ -598,7 +604,7 @@
 
 <!-- Lightbox imagen grande -->
 <div class="lightbox" id="lightbox">
-  <img id="lightboxImg" alt="Imagen ampliada" />
+<img id="lightboxImg" alt="Imagen ampliada" onclick="toggleZoom(event)" />
 </div>
 
 <script>
