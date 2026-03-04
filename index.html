@@ -860,7 +860,9 @@ async function loadSheet(){
 
     if(r.calidad) p.qualities.add(r.calidad);
     if(r.medida_cm) p.sizes.add(r.medida_cm);
-    if(r.color) p.colors.add(r.color);
+ if(r.color){
+  r.color.split("|").map(c => c.trim()).forEach(c => p.colors.add(c));
+}
 
     if(!p.carta_colores && r.carta_colores) p.carta_colores = r.carta_colores;
     if(!p.imagenes && r.imagenes) p.imagenes = r.imagenes;
