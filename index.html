@@ -604,7 +604,11 @@
 
 <!-- Lightbox imagen grande -->
 <div class="lightbox" id="lightbox">
+<button id="chartPrev" class="navbtn left">‹</button>
+
 <img id="lightboxImg" alt="Imagen ampliada" onclick="toggleZoom(event)" />
+
+<button id="chartNext" class="navbtn right">›</button>
 </div>
 
 <script>
@@ -630,6 +634,8 @@ let selectedRow = null;     // variante exacta elegida en modal
 
 let carouselImages = [];
 let carouselIndex = 0;
+let chartImages = [];
+let chartIndex = 0;
 
 let currentSelections = { calidad:"", medida:"", color:"" };
 let selectedQty = null;
@@ -1013,11 +1019,12 @@ btn.onclick = ()=>{
     return;
   }
 
-  // mostramos la primera imagen en el lightbox
-  $("lightboxImg").src = imgs[0];
-  $("lightbox").classList.add("open");
+  chartImages = imgs;
+  chartIndex = 0;
 
-  let index = 0;
+  $("lightboxImg").src = chartImages[chartIndex];
+  $("lightbox").classList.add("open");
+};
 
   function next(){
     index = (index + 1) % imgs.length;
@@ -1627,6 +1634,16 @@ $("qtyBox").addEventListener("keydown", (e)=>{
 });
 document.addEventListener("click", ()=>{
   if($("qtyMenu").classList.contains("open")) closeQtyMenu();
+});
+
+  $("chartPrev").addEventListener("click", ()=>{
+  chartIndex = (chartIndex - 1 + chartImages.length) % chartImages.length;
+  $("lightboxImg").src = chartImages[chartIndex];
+});
+
+$("chartNext").addEventListener("click", ()=>{
+  chartIndex = (chartIndex + 1) % chartImages.length;
+  $("lightboxImg").src = chartImages[chartIndex];
 });
 
 /********************
