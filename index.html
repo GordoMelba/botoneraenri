@@ -1026,37 +1026,7 @@ btn.onclick = ()=>{
   $("lightbox").classList.add("open");
 };
 
-  function next(){
-    index = (index + 1) % imgs.length;
-    $("lightboxImg").src = imgs[index];
-  }
-
-  function prev(){
-    index = (index - 1 + imgs.length) % imgs.length;
-    $("lightboxImg").src = imgs[index];
-  }
-
-  // flechas teclado
-  document.onkeydown = (e)=>{
-    if(e.key === "ArrowRight") next();
-    if(e.key === "ArrowLeft") prev();
-  };
-
-  // swipe celular
-  let startX = 0;
-
-  $("lightboxImg").ontouchstart = (e)=>{
-    startX = e.changedTouches[0].screenX;
-  };
-
-  $("lightboxImg").ontouchend = (e)=>{
-    const diff = e.changedTouches[0].screenX - startX;
-
-    if(Math.abs(diff) > 40){
-      if(diff < 0) next();
-      else prev();
-    }
-  };
+ 
 };
 
   const input = document.createElement("input");
@@ -1615,6 +1585,15 @@ $("mainImg").addEventListener("click", ()=>{
   openLightbox(carouselImages[carouselIndex]);
 });
 $("lightbox").addEventListener("click", closeLightbox);
+  $("chartPrev").addEventListener("click", ()=>{
+  chartIndex = (chartIndex - 1 + chartImages.length) % chartImages.length;
+  $("lightboxImg").src = chartImages[chartIndex];
+});
+
+$("chartNext").addEventListener("click", ()=>{
+  chartIndex = (chartIndex + 1) % chartImages.length;
+  $("lightboxImg").src = chartImages[chartIndex];
+});
 
 $("addToCart").addEventListener("click", addToCartFromModal);
 
