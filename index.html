@@ -1428,7 +1428,7 @@ function addToCartFromModal(){
       codigo_base: selectedProduct.codigo_base,
       calidad: selectedRow.calidad,
       medida_cm: selectedRow.medida_cm,
-      color: selectedRow.color,
+     color: currentSelections.color || selectedRow.color,
       qty,
       unidad: selectedRow.unidad || "u",
       codigo_color: selectedRow.codigo_color,
