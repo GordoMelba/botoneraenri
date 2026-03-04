@@ -536,7 +536,7 @@
         <div class="small" id="mSub"></div>
       </div>
       <div class="row">
-       <button class="btn" id="btnColorChart" style="display:none;">Carta de colores</button>
+       
         <button class="btn" id="closeProduct">Cerrar</button>
       </div>
     </div>
@@ -971,22 +971,7 @@ function openProductModal(p){
   $("pDesc").textContent = p.descripcion || "";
 
   // Carta de colores
-  if(p.carta_colores){
-    $("btnColorChart").style.display = "inline-flex";
-    $("btnColorChart").onclick = ()=>{
-  const imgs = splitList(p.carta_colores).map(buildUrl);
-  if(!imgs.length) return;
 
-  carouselImages = imgs;
-  carouselIndex = 0;
-  renderCarousel();
-
-  $("productModal").classList.add("open");
-};
-  }else{
-    $("btnColorChart").style.display = "none";
-    $("btnColorChart").onclick = null;
-  }
 
   // Selections iniciales
   currentSelections.calidad = p.qualities[0] || "";
