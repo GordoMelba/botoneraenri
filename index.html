@@ -1636,16 +1636,7 @@ document.addEventListener("click", ()=>{
   if($("qtyMenu").classList.contains("open")) closeQtyMenu();
 });
 
-  $("chartPrev").addEventListener("click", ()=>{
-  chartIndex = (chartIndex - 1 + chartImages.length) % chartImages.length;
-  $("lightboxImg").src = chartImages[chartIndex];
-});
-
-$("chartNext").addEventListener("click", ()=>{
-  chartIndex = (chartIndex + 1) % chartImages.length;
-  $("lightboxImg").src = chartImages[chartIndex];
-});
-
+ 
 /********************
  * INIT
  ********************/
