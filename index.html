@@ -961,7 +961,16 @@ function openProductModal(p){
   // Carta de colores
   if(p.carta_colores){
     $("btnColorChart").style.display = "inline-flex";
-    $("btnColorChart").onclick = ()=> window.open(buildUrl(p.carta_colores), "_blank");
+    $("btnColorChart").onclick = ()=>{
+  const imgs = splitList(p.carta_colores).map(buildUrl);
+  if(!imgs.length) return;
+
+  carouselImages = imgs;
+  carouselIndex = 0;
+  renderCarousel();
+
+  $("productModal").classList.add("open");
+};
   }else{
     $("btnColorChart").style.display = "none";
     $("btnColorChart").onclick = null;
