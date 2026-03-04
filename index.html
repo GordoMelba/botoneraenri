@@ -1554,6 +1554,18 @@ function closeLightbox(){
   $("lightboxImg").removeAttribute("src");
 }
 
+  function toggleZoom(e){
+  const img = e.target;
+
+  if(img.style.transform === "scale(2)"){
+    img.style.transform = "scale(1)";
+    img.style.cursor = "zoom-in";
+  }else{
+    img.style.transform = "scale(2)";
+    img.style.cursor = "zoom-out";
+  }
+}
+
 /********************
  * Mobile: VER PEDIDO (scroll al panel derecho)
  ********************/
