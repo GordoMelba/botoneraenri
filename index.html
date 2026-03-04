@@ -999,14 +999,19 @@ if(p.rows.some(r => normLower(r.es_plastico) === "true")){
   btn.className = "btn";
   btn.textContent = "Ver carta de colores";
 
-  btn.onclick = ()=>{
-    const url = p.carta_colores || "";
-    if(url){
-      window.open(buildUrl(url), "_blank");
-    }else{
-      alert("No hay carta de colores cargada.");
-    }
-  };
+btn.onclick = ()=>{
+  const imgs = splitList(p.carta_colores).map(buildUrl);
+
+  if(!imgs.length){
+    alert("No hay carta de colores cargada.");
+    return;
+  }
+
+  carouselImages = imgs;
+  carouselIndex = 0;
+
+  renderCarousel();
+};
 
   const input = document.createElement("input");
   input.placeholder = "Escribir número de color";
