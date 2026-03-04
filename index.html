@@ -1584,7 +1584,9 @@ $("mainImg").addEventListener("click", ()=>{
   openLightbox(carouselImages[carouselIndex]);
 });
 $("lightbox").addEventListener("click", closeLightbox);
-  $("chartPrev").addEventListener("click", ()=>{
+ $("chartPrev").addEventListener("click", (e)=>{
+  e.stopPropagation();
+
   chartIndex = (chartIndex - 1 + chartImages.length) % chartImages.length;
   $("lightboxImg").src = chartImages[chartIndex];
 });
