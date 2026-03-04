@@ -1155,13 +1155,21 @@ function updateVariant(){
     (stock === null || stock === undefined) ? "" : `Stock: ${stock}`;
 
   // Reglas
-  const unit = selectedRow.unidad || "u";
-  const min = parseNum(selectedRow.minimo) ?? 1;
-  const rule = selectedRow.regla_cantidad || "";
-  const parts = [];
-  if(min > 1) parts.push(`Mínimo: ${min} ${unit}`);
-  if(rule) parts.push(rule);
-  $("ruleText").textContent = parts.join(" · ");
+ const unit = selectedRow.unidad || "u";
+const rule = selectedRow.regla_cantidad || "";
+
+let step = null;
+
+if(rule){
+  const m = rule.match(/:(\d+)/);
+  if(m) step = m[1];
+}
+
+if(step){
+  $("ruleText").textContent = `Los paquetes se venden cerrados y vienen de a ${step} ${unit}`;
+}else{
+  $("ruleText").textContent = "";
+}
 
   // Cantidad: generar menú y setear default
   const options = buildQtyOptions(selectedRow);
