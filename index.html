@@ -981,10 +981,44 @@ function openProductModal(p){
     currentSelections.medida = v;
     updateVariant();
   });
+  // Si es plástico mostramos carta de colores + input
+if(p.rows.some(r => normLower(r.es_plastico) === "true")){
+  const wrap = document.getElementById("optColor");
+  wrap.innerHTML = "";
+
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.textContent = "Ver carta de colores";
+
+  btn.onclick = ()=>{
+    const url = p.carta_colores || "";
+    if(url){
+      window.open(buildUrl(url), "_blank");
+    }else{
+      alert("No hay carta de colores cargada.");
+    }
+  };
+
+  const input = document.createElement("input");
+  input.placeholder = "Escribir número de color";
+  input.style.width = "180px";
+
+  input.oninput = ()=>{
+    currentSelections.color = input.value;
+    updateVariant();
+  };
+
+  wrap.appendChild(btn);
+  wrap.appendChild(input);
+
+}else{
+
   renderOptionButtons("optColor", p.colors, currentSelections.color, (v)=>{
     currentSelections.color = v;
     updateVariant();
   });
+
+}
 
   // Abrir modal
   $("productModal").classList.add("open");
