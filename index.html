@@ -1591,7 +1591,9 @@ $("lightbox").addEventListener("click", closeLightbox);
   $("lightboxImg").src = chartImages[chartIndex];
 });
 
-$("chartNext").addEventListener("click", ()=>{
+$("chartNext").addEventListener("click", (e)=>{
+  e.stopPropagation();
+
   chartIndex = (chartIndex + 1) % chartImages.length;
   $("lightboxImg").src = chartImages[chartIndex];
 });
