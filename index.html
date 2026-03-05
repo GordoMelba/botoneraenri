@@ -838,7 +838,7 @@ async function loadSheet(){
 
   const map = new Map();
   for(const r of rawRows){
-    const key = `${r.categoria}||${r.producto}||${r.codigo_base}`;
+    const key = `${r.categoria}||${r.producto}`;
     if(!map.has(key)){
       map.set(key, {
         key,
@@ -954,7 +954,7 @@ function renderList(){
     meta.className = "meta";
     meta.innerHTML = `
       <div class="title">${escapeHtml(p.producto)}</div>
-      <div class="code">${escapeHtml(p.codigo_base || "")}</div>
+      <div class="code">${p.qualities.join(" / ")}</div>
     `;
 
     card.appendChild(imgWrap);
