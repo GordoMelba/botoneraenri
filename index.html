@@ -1086,8 +1086,7 @@ function findBestRow(p, calidad, medida, color){
 
     if(calidad && r.calidad === calidad) s += 4;
     if(medida && r.medida_cm === medida) s += 3;
-    if(color  && r.color === color) s += 5;
-
+if(color && normLower(r.color) === normLower(color)) s += 5;
     if(calidad && r.calidad && r.calidad !== calidad) s -= 10;
     if(medida && r.medida_cm && r.medida_cm !== medida) s -= 8;
     if(color  && r.color && r.color !== color) s -= 12;
