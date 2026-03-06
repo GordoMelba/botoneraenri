@@ -589,15 +589,27 @@
         <div class="sep"></div>
 
         <div class="row" style="justify-content:space-between;">
-          <div>
-            <div class="muted" style="font-size:12px;">Precio unitario</div>
-            <div class="price" id="priceText">Consultar</div>
-            <div class="muted" style="font-size:12px; margin-top:4px;" id="stockText"></div>
-          </div>
-          <button class="btn primary" id="addToCart">Agregar al pedido</button>
-        </div>
+  <div>
+    <div class="muted" style="font-size:12px;">Precio unitario</div>
+    <div class="price" id="priceText">Consultar</div>
+    <div class="muted" style="font-size:12px; margin-top:4px;" id="stockText"></div>
+  </div>
+  <button class="btn primary" id="addToCart">Agregar al pedido</button>
+</div>
 
-        <div class="help" id="addHint"></div>
+<div id="longerMeasureQuestion" style="display:none; margin-top:12px;">
+  <div class="muted" style="font-size:12px; margin-bottom:8px;">
+    Si no hay de la medida elegida, ¿se puede poner alguna medida más larga?
+  </div>
+
+  <div class="optionGroup" id="longerMeasureOptions">
+    <div class="optionBtn" data-value="SI">Sí</div>
+    <div class="optionBtn" data-value="NO">No</div>
+  </div>
+</div>
+
+<div class="help" id="addHint"></div>
+        
       </div>
     </div>
   </div>
@@ -640,6 +652,7 @@ let chartIndex = 0;
 
 let currentSelections = { calidad:"", medida:"", color:"" };
 let selectedQty = null;
+let selectedLongerMeasureAnswer = "";
 
 const cart = [];
 
@@ -811,26 +824,27 @@ async function loadSheet(){
     const reglaB = norm(get("reglas_cantidad"));
 
     return {
-      categoria: norm(get("categoria")),
-      producto: norm(get("producto")),
-      descripcion_producto: norm(get("descripcion_producto")),
-      calidad: norm(get("calidad")),
-      codigo_base: norm(get("codigo_base")),
-      medida_cm: norm(get("medida_cm")),
-      color: norm(get("color")),
-      codigo_color: norm(get("codigo_color")),
-      precio_unitario: parseNum(get("precio_unitario")),
-      stock_disponible: parseNum(get("stock_disponible")),
-      unidad: norm(get("unidad")) || "u",
-      minimo: get("minimo"),
-      regla_cantidad: reglaA || reglaB,     // usa la que exista
-      reglas_cantidad: reglaB || reglaA,    // por si la querés inspeccionar
-      es_plastico: norm(get("es_plastico")),
-      carta_colores: norm(get("carta_colores")),
-      imagenes: norm(get("imagenes")),
-      color_modo: norm(get("color_modo")),
-      imagenes_por_color: norm(get("imagenes_por_color"))
-    };
+  categoria: norm(get("categoria")),
+  producto: norm(get("producto")),
+  descripcion_producto: norm(get("descripcion_producto")),
+  calidad: norm(get("calidad")),
+  codigo_base: norm(get("codigo_base")),
+  medida_cm: norm(get("medida_cm")),
+  color: norm(get("color")),
+  codigo_color: norm(get("codigo_color")),
+  precio_unitario: parseNum(get("precio_unitario")),
+  stock_disponible: parseNum(get("stock_disponible")),
+  unidad: norm(get("unidad")) || "u",
+  minimo: get("minimo"),
+  regla_cantidad: reglaA || reglaB,
+  reglas_cantidad: reglaB || reglaA,
+  es_plastico: norm(get("es_plastico")),
+  carta_colores: norm(get("carta_colores")),
+  imagenes: norm(get("imagenes")),
+  color_modo: norm(get("color_modo")),
+  imagenes_por_color: norm(get("imagenes_por_color")),
+  pregunta_medida_mas_larga: normLower(get("pregunta_medida_mas_larga"))
+};
   }).filter(r => r.categoria && r.producto);
 
   rawRows = data;
@@ -968,6 +982,7 @@ function renderList(){
  ********************/
 function openProductModal(p){
   selectedProduct = p;
+  selectedLongerMeasureAnswer = "";
   $("mTitle").textContent = p.producto;
   $("mSub").textContent = [p.categoria, p.codigo_base].filter(Boolean).join(" · ");
   $("pName").textContent = p.producto;
@@ -1055,9 +1070,41 @@ function closeProductModal(){
   carouselImages = [];
   carouselIndex = 0;
   selectedQty = null;
+  selectedLongerMeasureAnswer = "";
+  resetLongerMeasureQuestion();
   $("addHint").textContent = "";
 }
 
+  
+function needsLongerMeasureQuestion(row){
+  const v = normLower(row?.pregunta_medida_mas_larga);
+  return v === "true" || v === "si" || v === "sí" || v === "1";
+}
+
+function resetLongerMeasureQuestion(){
+  selectedLongerMeasureAnswer = "";
+  const wrap = $("longerMeasureQuestion");
+  const opts = document.querySelectorAll("#longerMeasureOptions .optionBtn");
+
+  wrap.style.display = "none";
+  opts.forEach(btn => btn.classList.remove("active"));
+}
+
+function showLongerMeasureQuestion(){
+  const wrap = $("longerMeasureQuestion");
+  const opts = document.querySelectorAll("#longerMeasureOptions .optionBtn");
+
+  wrap.style.display = "block";
+
+  opts.forEach(btn=>{
+    btn.onclick = ()=>{
+      selectedLongerMeasureAnswer = btn.getAttribute("data-value") || "";
+      opts.forEach(x => x.classList.remove("active"));
+      btn.classList.add("active");
+    };
+  });
+}
+  
 function renderOptionButtons(containerId, values, selectedValue, onChange){
   const wrap = document.getElementById(containerId);
   wrap.innerHTML = "";
@@ -1119,11 +1166,12 @@ function updateVariant(){
 
   selectedRow = findBestRow(selectedProduct, currentSelections.calidad, currentSelections.medida, currentSelections.color);
 
-  if(!selectedRow){
+    if(!selectedRow){
     $("priceText").textContent = "Consultar";
     $("stockText").textContent = "";
     $("ruleText").textContent = "";
     $("addHint").textContent = "No se encontró una variante para esa combinación.";
+    resetLongerMeasureQuestion();
     carouselImages = parseImagesField(selectedProduct.imagenes);
     carouselIndex = 0;
     renderCarousel();
@@ -1168,6 +1216,12 @@ if(step){
     renderQtyMenu([]);
   }
 
+  // Pregunta obligatoria por medida más larga
+  resetLongerMeasureQuestion();
+  if(needsLongerMeasureQuestion(selectedRow)){
+    showLongerMeasureQuestion();
+  }
+  
   // Imágenes: dinámicas solo si corresponde
   carouselImages = getImagesForModal(selectedProduct, currentSelections.color);
   carouselIndex = 0;
@@ -1364,12 +1418,13 @@ function renderCart(){
       <div class="left">
         <div class="name">${escapeHtml(it.producto)}</div>
         <div class="line">
-          ${it.codigo_base ? `Código: <b>${escapeHtml(it.codigo_base)}</b> · ` : ""}
-          ${it.calidad ? `Calidad: <b>${escapeHtml(it.calidad)}</b> · ` : ""}
-          ${it.medida_cm ? `Medida: <b>${escapeHtml(it.medida_cm)} cm</b> · ` : ""}
-          ${it.color ? `Color: <b>${escapeHtml(it.color)}</b> · ` : ""}
-          Cant: <b>${escapeHtml(it.qty)} ${escapeHtml(it.unidad)}</b>
-        </div>
+  ${it.codigo_base ? `Código: <b>${escapeHtml(it.codigo_base)}</b> · ` : ""}
+  ${it.calidad ? `Calidad: <b>${escapeHtml(it.calidad)}</b> · ` : ""}
+  ${it.medida_cm ? `Medida: <b>${escapeHtml(it.medida_cm)} cm</b> · ` : ""}
+  ${it.color ? `Color: <b>${escapeHtml(it.color)}</b> · ` : ""}
+  ${it.permite_medida_mas_larga ? `Si no hay medida exacta: <b>${escapeHtml(it.permite_medida_mas_larga)}</b> · ` : ""}
+  Cant: <b>${escapeHtml(it.qty)} ${escapeHtml(it.unidad)}</b>
+</div>
       </div>
       <div class="actions">
         <button class="miniBtn" data-del="${idx}">Eliminar</button>
@@ -1411,23 +1466,29 @@ function addToCartFromModal(){
     return;
   }
 
+  if(needsLongerMeasureQuestion(selectedRow) && !selectedLongerMeasureAnswer){
+    $("addHint").textContent = "Debes indicar si se puede poner una medida más larga.";
+    return;
+  }
+
   const key = `${selectedProduct.key}||${selectedRow.calidad}||${selectedRow.medida_cm}||${selectedRow.color}`;
 
   const existing = cart.find(x=>x.key === key);
   if(existing){
     existing.qty += qty;
   }else{
-    cart.push({
+        cart.push({
       key,
       producto: selectedProduct.producto,
       codigo_base: selectedProduct.codigo_base,
       calidad: selectedRow.calidad,
       medida_cm: selectedRow.medida_cm,
-     color: currentSelections.color || selectedRow.color,
+      color: currentSelections.color || selectedRow.color,
       qty,
       unidad: selectedRow.unidad || "u",
       codigo_color: selectedRow.codigo_color,
-      precio_unitario: selectedRow.precio_unitario
+      precio_unitario: selectedRow.precio_unitario,
+      permite_medida_mas_larga: selectedLongerMeasureAnswer
     });
   }
 
@@ -1451,7 +1512,7 @@ function buildWhatsAppText(includeNameStrict){
   lines.push("");
   lines.push("Items:");
 
-  cart.forEach((it, i)=>{
+    cart.forEach((it, i)=>{
     const parts = [];
     if(it.codigo_base) parts.push(it.codigo_base);
     if(it.color) parts.push(it.color);
@@ -1460,6 +1521,10 @@ function buildWhatsAppText(includeNameStrict){
     const qtyLine = `   Cantidad: ${it.qty} ${it.unidad}`;
     lines.push(head);
     lines.push(qtyLine);
+
+    if(it.permite_medida_mas_larga){
+      lines.push(`   Si no hay medida exacta, se puede poner una más larga: ${it.permite_medida_mas_larga}`);
+    }
   });
 
   // NUEVO: resumen en códigos al final
